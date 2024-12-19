@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th12 18, 2024 lúc 09:46 AM
+-- Thời gian đã tạo: Th12 19, 2024 lúc 10:29 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -28,7 +28,8 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `customer` (
-  `customer_id` varchar(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `phone_number` int(11) NOT NULL,
   `customer_name` varchar(50) NOT NULL,
   `address` varchar(50) NOT NULL,
   `gmail` varchar(50) NOT NULL,
@@ -39,8 +40,11 @@ CREATE TABLE `customer` (
 -- Đang đổ dữ liệu cho bảng `customer`
 --
 
-INSERT INTO `customer` (`customer_id`, `customer_name`, `address`, `gmail`, `role_id`) VALUES
-('0123456789', '', '', '', 1);
+INSERT INTO `customer` (`customer_id`, `phone_number`, `customer_name`, `address`, `gmail`, `role_id`) VALUES
+(1, 64852597, 'ert', 'Ninh Hoa,Khánh Hòa', '', 1),
+(2, 1312314, 'anh Hải', 'Ninh Hoa,Khánh Hòa', '', 1),
+(3, 841312314, 'anh Hải', 'Ninh Hoa,Khánh Hòa', '', 1),
+(4, 13132314, 'anh Hải', '20', '', 1);
 
 -- --------------------------------------------------------
 
@@ -52,8 +56,7 @@ CREATE TABLE `note` (
   `note_id` int(5) NOT NULL,
   `note_name` varchar(50) NOT NULL,
   `description` varchar(500) NOT NULL,
-  `note_img` varchar(50) NOT NULL,
-  `type_status_id` int(5) NOT NULL
+  `note_img` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -68,9 +71,19 @@ CREATE TABLE `oder` (
   `oder_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `description` varchar(200) NOT NULL,
   `status_id` int(5) NOT NULL,
-  `customer_id` varchar(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
   `total_price` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `oder`
+--
+
+INSERT INTO `oder` (`oder_id`, `address`, `oder_date`, `description`, `status_id`, `customer_id`, `total_price`) VALUES
+(38, 'Ninh Hoa,Khánh Hòa', '2024-12-19 09:06:42', '', 1, 2, 0),
+(39, 'Ninh Hoa,Khánh Hòa', '2024-12-19 09:12:55', '', 1, 3, 0),
+(40, '20', '2024-12-19 09:14:27', '', 1, 4, 0),
+(46, '20', '2024-12-19 09:27:31', '', 1, 2, 0);
 
 -- --------------------------------------------------------
 
@@ -85,6 +98,20 @@ CREATE TABLE `oder_detail` (
   `quantity_oder` int(11) NOT NULL,
   `price_oder` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `oder_detail`
+--
+
+INSERT INTO `oder_detail` (`detail_id`, `product_id`, `oder_id`, `quantity_oder`, `price_oder`) VALUES
+(17, 25, 38, 1, 1114),
+(18, 24, 38, 1, 90),
+(19, 24, 39, 1, 90),
+(20, 26, 39, 1, 233),
+(21, 25, 40, 1, 1114),
+(22, 33, 40, 1, 233),
+(23, 24, 46, 1, 90),
+(24, 33, 46, 1, 233);
 
 -- --------------------------------------------------------
 
@@ -109,7 +136,7 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`product_id`, `product_name`, `describe_product`, `quantity`, `price`, `img`, `create_at`, `type_id`, `saleoff_id`) VALUES
-(24, 'yến 1', 'czcxzcdaferteryeryerter', 2, 90, 'Copy of Sua non to yen cho nguoi gia 1.png', '2024-12-18 00:50:21', 23, 15),
+(24, 'yến 1', '', 2, 90, 'Copy of Sua non to yen cho nguoi gia 1.png', '2024-12-18 00:50:21', 23, 15),
 (25, 'yến 2', '', 2, 1114, 'Copy of KHÔNG-ĐƯỜNG-png-scaled-e1636422295115.png', '2024-12-18 00:50:49', 23, 15),
 (26, 'yến 3', '', 1, 233, 'Copy of Nuoc yen nhan sam 1.png', '2024-12-18 00:51:12', 23, 15),
 (27, 'yến 4', '', 2, 900, 'Copy of H 1  yến sào hồng sâm-01.png', '2024-12-18 00:52:19', 23, 15),
@@ -119,8 +146,7 @@ INSERT INTO `product` (`product_id`, `product_name`, `describe_product`, `quanti
 (33, 'yến 8', '', 1, 233, 'Copy of H 1  yến sào hồng sâm-01.png', '2024-12-18 01:02:44', 23, 15),
 (34, 'yến 9', '', 2, 233, 'Copy of KHÔNG-ĐƯỜNG-png-scaled-e1636422295115.png', '2024-12-18 01:02:54', 23, 15),
 (35, 'yến 10', '', 2, 321, 'Copy of H 1  hồng sâm đông trùng hạ thảo-01.png', '2024-12-18 01:03:12', 23, 15),
-(36, 'yến 11', '', 1, 233, 'Copy of Nuoc yen nhan sam 2.png', '2024-12-18 01:03:25', 23, 15),
-(37, 'rong nho 1', 'dsadsa', 2, 233, 'Copy of GÓI 100G IN FULL - T.jpg', '2024-12-18 06:24:49', 24, 15);
+(36, 'yến 11', '', 1, 233, 'Copy of Nuoc yen nhan sam 2.png', '2024-12-18 01:03:25', 23, 15);
 
 -- --------------------------------------------------------
 
@@ -208,19 +234,7 @@ CREATE TABLE `type` (
 --
 
 INSERT INTO `type` (`type_id`, `type_name`, `type_img`) VALUES
-(23, 'yến', 'Copy of H 1  hồng sâm đông trùng hạ thảo-01.png'),
-(24, 'rong nho', 'Copy of box Vmax-01.png');
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `type_status`
---
-
-CREATE TABLE `type_status` (
-  `type_status_id` int(5) NOT NULL,
-  `type_status_name` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+(23, 'yến', 'Copy of H 1  hồng sâm đông trùng hạ thảo-01.png');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -237,8 +251,7 @@ ALTER TABLE `customer`
 -- Chỉ mục cho bảng `note`
 --
 ALTER TABLE `note`
-  ADD PRIMARY KEY (`note_id`),
-  ADD KEY `type_status_id` (`type_status_id`);
+  ADD PRIMARY KEY (`note_id`);
 
 --
 -- Chỉ mục cho bảng `oder`
@@ -295,38 +308,38 @@ ALTER TABLE `type`
   ADD PRIMARY KEY (`type_id`);
 
 --
--- Chỉ mục cho bảng `type_status`
---
-ALTER TABLE `type_status`
-  ADD PRIMARY KEY (`type_status_id`);
-
---
 -- AUTO_INCREMENT cho các bảng đã đổ
 --
+
+--
+-- AUTO_INCREMENT cho bảng `customer`
+--
+ALTER TABLE `customer`
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT cho bảng `note`
 --
 ALTER TABLE `note`
-  MODIFY `note_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `note_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT cho bảng `oder`
 --
 ALTER TABLE `oder`
-  MODIFY `oder_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `oder_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT cho bảng `oder_detail`
 --
 ALTER TABLE `oder_detail`
-  MODIFY `detail_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `detail_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT cho bảng `product`
 --
 ALTER TABLE `product`
-  MODIFY `product_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `product_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT cho bảng `role`
@@ -356,13 +369,7 @@ ALTER TABLE `status`
 -- AUTO_INCREMENT cho bảng `type`
 --
 ALTER TABLE `type`
-  MODIFY `type_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
-
---
--- AUTO_INCREMENT cho bảng `type_status`
---
-ALTER TABLE `type_status`
-  MODIFY `type_status_id` int(5) NOT NULL AUTO_INCREMENT;
+  MODIFY `type_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Các ràng buộc cho các bảng đã đổ
@@ -375,17 +382,11 @@ ALTER TABLE `customer`
   ADD CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`);
 
 --
--- Các ràng buộc cho bảng `note`
---
-ALTER TABLE `note`
-  ADD CONSTRAINT `note_ibfk_1` FOREIGN KEY (`type_status_id`) REFERENCES `type_status` (`type_status_id`);
-
---
 -- Các ràng buộc cho bảng `oder`
 --
 ALTER TABLE `oder`
   ADD CONSTRAINT `oder_ibfk_1` FOREIGN KEY (`status_id`) REFERENCES `status` (`status_id`),
-  ADD CONSTRAINT `oder_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`);
+  ADD CONSTRAINT `order_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`);
 
 --
 -- Các ràng buộc cho bảng `oder_detail`

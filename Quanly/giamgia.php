@@ -63,6 +63,7 @@ $result = mysqli_query($conn, $query);
                 <li><a href="../Quanly/nhanvien.php">Quản lý nhân viên</a></li>
                 <li><a href="../Quanly/sanpham.php">Quản lý sản phẩm</a></li>
                 <li><a href="../Quanly/donhang.php">Quản lý đơn hàng</a></li>
+                <li><a href="../Quanly/qlslsp.php">Quản lý sl trong đơn hàng</a></li>
                 <li><a href="../Quanly/loaisp.php">Quản lý loại sản phẩm</a></li>
                 <li><a href="../Quanly/giamgia.php">Quản lý giảm giá</a></li>
                 <li><a href="../Quanly/tintuc.php">Quản lý tin tức</a></li>

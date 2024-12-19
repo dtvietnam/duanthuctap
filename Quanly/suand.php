@@ -20,14 +20,14 @@ if (isset($_GET['id'])) {
 }
 
 if (isset($_POST['submit'])) {
+    $phone = trim($_POST['phone']);
     $customer_name = trim($_POST['customer_name']);
-    $username = trim($_POST['username']);
-    $password = trim($_POST['password']);
+    $address = trim($_POST['address']);
     $gmail = trim($_POST['gmail']);
 
     // Cập nhật sản phẩm vào CSDL
-    $stmt = $conn->prepare("UPDATE customer SET customer_name = ?, username = ?, password = ?, gmail = ? WHERE customer_id = ?");
-    $stmt->bind_param("ssssi", $customer_name, $username, $password, $gmail, $customer_id);
+    $stmt = $conn->prepare("UPDATE customer SET phone = ?, customer_name = ?, address = ?, gmail = ? WHERE customer_id = ?");
+    $stmt->bind_param("issss", $phone, $customer_name, $address, $gmail, $customer_id);
 
     if ($stmt->execute()) {
         header("Location: nguoidung.php");
@@ -45,7 +45,7 @@ if (isset($_POST['submit'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sửa Sản Phẩm</title>
+    <title>Sửa người dùng</title>
     <link rel="stylesheet" href="../path/to/your/css/bootstrap.min.css">
     <style>
         body {
@@ -121,24 +121,22 @@ if (isset($_POST['submit'])) {
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                     <div class="mb-3">
+                        <label class="form-label">Số điện thoại người dùng</label>
+                        <input type="text" name="phone" value="<?= $customer['phone'] ?>" class="form-control"
+                            required />
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Tên người dùng</label>
                         <input type="text" name="customer_name" value="<?= $customer['customer_name'] ?>"
-                            class="form-control" required />
+                            class="form-control" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tên Đăng Nhập</label>
-                        <input type="text" name="username" value="<?= $customer['username'] ?>" class="form-control"
-                            required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="text" name="password" value="<?= $customer['password'] ?>" class="form-control"
-                            required />
+                        <label class="form-label">Địa chỉ</label>
+                        <input type="text" name="address" value="<?= $customer['address'] ?>" class="form-control" />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email</label>
-                        <input type="text" name="gmail" value="<?= $customer['gmail'] ?>" class="form-control"
-                            required />
+                        <input type="text" name="gmail" value="<?= $customer['gmail'] ?>" class="form-control" />
                     </div>
                     <button name="submit" type="submit" class="btn btn-success">Cập nhật thông tin người dùng</button>
                 </form>

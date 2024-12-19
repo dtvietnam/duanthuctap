@@ -1,6 +1,6 @@
 <?php
 ob_start();
-include '../Thanhgiaodien/header.php';
+// include '../Thanhgiaodien/header.php';
 include '../database/connect.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -28,12 +28,12 @@ error_reporting(E_ALL);
             unset($_SESSION['giohang'][$id]);
         }
     }
-    if (isset($_SESSION['customer_id'])) {
-        $id = $_SESSION['customer_id'];
-        $sql = "SELECT `customer_id`, `customer_name`, `address`FROM `customer` WHERE customer_id =  $id";
+    if (isset($_SESSION['phone_number'])) {
+        $id = $_SESSION['phone_number'];
+        $sql = "SELECT `phone_number`, `customer_name`, `address`FROM `customer` WHERE phone_number =  $id";
         $result = mysqli_query($conn, $sql);
         while ($row = mysqli_fetch_assoc($result)) {
-            $sdt = $row['customer_id'];
+            $sdt = $row['phone_number'];
             $name = $row['customer_name'];
             $add = $row['address'];
         }
@@ -49,6 +49,7 @@ error_reporting(E_ALL);
     }
 
     $error_message = [];
+    $customer_id = null;
     if (isset($_POST['submit'])) {
         // Lấy thông tin từ form
         $customer_name = trim($_POST['customer_name']);
@@ -56,26 +57,41 @@ error_reporting(E_ALL);
         $description = trim($_POST['dedescription']);
         $giohang = json_decode($_POST['giohang'], true);
         $total_price = $_POST['total_price'] ?? 0;
-        if (isset($_SESSION['customer_id'])) {
-            $customer_id = $_SESSION['customer_id']; // Using logged-in customer
-        } else {
-            $customer_id = $_POST['customer_id'];
-            $kt_customer = $conn->prepare("SELECT * FROM customer WHERE customer_id = ?");
-            $kt_customer->bind_param("s", $customer_id);
+        if (isset($_SESSION['phone_number'])) {
+            $phone_number = $_SESSION['phone_number']; // Using logged-in customer
+            $phone_number = preg_replace('/^0/', '+0', $phone_number);
+            $kt_customer = $conn->prepare("SELECT `customer_id` FROM `customer` WHERE phone_number= ?");
+            $kt_customer->bind_param("i", $phone_number);
             $kt_customer->execute();
             $kt_result = $kt_customer->get_result();
-            if ($kt_result->num_rows === 0) {
-                // Insert new customer into the database
-                $sql_customer = "INSERT INTO customer (customer_id, customer_name, address, role_id) VALUES (?, ?, ?, 1)";
+            if ($kt_result->num_rows > 0) {
+                $customer = $kt_result->fetch_assoc();
+                $customer_id = $customer['customer_id']; 
+            } 
+        } else {
+            $phone_number = $_POST['phone_number'];
+            $phone_number = preg_replace('/^0/', '+0', $phone_number);
+
+            $kt_customer = $conn->prepare("SELECT `customer_id` FROM `customer` WHERE phone_number= ?");
+            $kt_customer->bind_param("i", $phone_number);
+            $kt_customer->execute();
+            $kt_result = $kt_customer->get_result();
+            if ($kt_result->num_rows > 0) {
+                $customer = $kt_result->fetch_assoc();
+                $customer_id = $customer['customer_id']; 
+            }else {
+                // Nếu không tồn tại, thêm mới khách hàng
+                $sql_customer = "INSERT INTO customer (phone_number, customer_name, address, role_id) VALUES (?, ?, ?, 1)";
                 $stmt_customer = $conn->prepare($sql_customer);
-                $stmt_customer->bind_param("sss", $customer_id, $customer_name, $address);
+                $stmt_customer->bind_param("iss", $phone_number, $customer_name, $address);
                 $stmt_customer->execute();
-                $customer_id = $conn->insert_id; // Get the new customer ID
+                $customer_id = $conn->insert_id; 
             }
 
         }
-        $sql_order = "INSERT INTO `oder` (address, description, status_id, customer_id, total_price) 
-              VALUES (?, ?, 1, ?, ?)";
+        echo $customer_id;
+        $sql_order = "INSERT INTO `oder` (address, description, customer_id, total_price, status_id) 
+        VALUES (?, ?, ?, ?, 1)";
         $stmt = $conn->prepare($sql_order);
         $stmt->bind_param("ssii", $address, $description, $customer_id, $total_price);
         $stmt->execute();
@@ -129,15 +145,18 @@ error_reporting(E_ALL);
                         $tong += $thanhtien; // Cộng dồn vào tổng giá trị
                         ?>
                         <tr>
-                            <td><img src="../anh/<?= htmlspecialchars($item['img']) ?>" class="product-image" alt="Hình sản phẩm">
+                            <td><img src="../anh/<?= htmlspecialchars($item['img']) ?>" class="product-image"
+                                    alt="Hình sản phẩm">
                             </td>
                             <td><?= htmlspecialchars($item['product_name']) ?></td>
                             <td class="product-price"><?= number_format($item['price']) ?> VNĐ</td>
                             <td>
                                 <div class='quantity-wrapper'>
                                     <button type='button' class='quantity-btn decrease' data-index='<?= $index ?>'>-</button>
-                                    <input type='number' class="no-spinners quantity-input" name='soluong[<?= $index ?>]'
-                                        min="1" step="1" value='<?= $quantity ?>'>
+                                    <input type="text" id="phone_number" class="no-spinners quantity-input"
+                                        name='soluong[<?= $index ?>]' required placeholder="Số điện thoại nhận hàng"
+                                        pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" min="1"
+                                        step="1" value='<?= $quantity ?>'><br>
                                     <button type='button' class='quantity-btn increase' data-index='<?= $index ?>'>+</button>
                                 </div>
                             </td>
@@ -177,9 +196,10 @@ error_reporting(E_ALL);
                         </td>
                         <td>
                             <div>
-                                <label for="customer_id">Số Điện Thoại</label><br>
-                                <input type="text" id="customer_id" name="customer_id" required
-                                    placeholder="Số điện thoại nhận hàng" value="<?= $sdt ?>"><br>
+                                <label for="phone_number">Số Điện Thoại</label><br>
+                                <input type="text" id="phone_number" name="phone_number" required
+                                    placeholder="Số điện thoại nhận hàng" value="<?= $sdt ?>" pattern="[0-9]*"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="11"><br>
                             </div>
                         </td>
                         <td>
@@ -196,7 +216,7 @@ error_reporting(E_ALL);
                         <td>
                             <div>
                                 <label for="description">Ghi chú</label><br>
-                                <textarea style="resize: none;" rows="7" cols="70" id="dedescription" name="dedescription"
+                                <textarea rows="4" cols="30" id="dedescription" name="dedescription"
                                     placeholder="Nhập yêu cầu của bạn"></textarea><br>
                             </div>
                         </td>

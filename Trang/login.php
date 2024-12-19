@@ -3,9 +3,9 @@ require_once '../database/connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $phone = $_POST['phone'];
-    $normalizedPhone = preg_replace('/^0/', '+84', $phone);
+    $normalizedPhone = preg_replace('/^0/', '+0', $phone);
 
-    $stmt = $conn->prepare("SELECT * FROM customer WHERE customer_id = ?");
+    $stmt = $conn->prepare("SELECT * FROM customer WHERE phone_number = ?");
     $stmt->bind_param("s", $phone);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     } else {
         $account = $result->fetch_assoc();
         session_start();
-        $_SESSION['customer_id'] = $account['customer_id'];
+        $_SESSION['phone_number'] = $account['phone_number'];
         if ($account['role_id'] == 2) {
             header("Location: ../Quanly/sanpham.php");
         } else {

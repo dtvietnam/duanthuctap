@@ -32,6 +32,7 @@ if (!$query) {
                 <li><a href="../Quanly/nhanvien.php">Quản lý nhân viên</a></li>
                 <li><a href="../Quanly/sanpham.php">Quản lý sản phẩm</a></li>
                 <li><a href="../Quanly/donhang.php">Quản lý đơn hàng</a></li>
+                <li><a href="../Quanly/qlslsp.php">Quản lý sl trong đơn hàng</a></li>
                 <li><a href="../Quanly/loaisp.php">Quản lý loại sản phẩm</a></li>
                 <li><a href="../Quanly/giamgia.php">Quản lý giảm giá</a></li>
                 <li><a href="../Quanly/tintuc.php">Quản lý tin tức</a></li>
@@ -56,7 +57,7 @@ if (!$query) {
                     if (mysqli_num_rows($query) > 0) {
                         while ($row = mysqli_fetch_assoc($query)) { ?>
                             <tr>
-                                <td><?= $row['customer_id'] ?></td>
+                                <td><?= $row['phone'] ?></td>
                                 <td><?= $row['customer_name'] ?></td>
                                 <td><?= $row['address'] ?></td>
                                 <td><?= $row['gmail'] ?></td>
