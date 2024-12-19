@@ -1,5 +1,4 @@
 <?php
-session_start();
 require '../database/connect.php';
 
 if (isset($_GET['phone'])) {

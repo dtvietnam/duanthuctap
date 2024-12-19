@@ -1,5 +1,4 @@
 <?php
-session_start();
 ob_start();
 include '../Thanhgiaodien/header.php';
 include '../database/connect.php';

@@ -1,5 +1,4 @@
 <?php
-session_start();
 global $conn;
 include '../database/connect.php';
 
