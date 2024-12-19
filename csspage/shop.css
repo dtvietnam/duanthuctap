@@ -1,0 +1,170 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    font-family: Arial, sans-serif;
+    height: 100%;
+    margin-top: 60px;
+}
+
+.shop {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.listtype {
+    width: 25%;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.listtype li {
+    list-style: none;
+    margin-bottom: 15px;
+}
+
+.listtype a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.listtype a:hover {
+    color: #0800ff;
+}
+
+.dsSanpham {
+    width: 70%;
+    padding: 20px;
+}
+
+.item {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.image img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.text {
+    text-align: center;
+}
+
+.name {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.button {
+    background-color: #0800ff;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #0066cc;
+}
+
+.page {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    list-style: none;
+    padding: 0;
+}
+
+.page li {
+    margin: 0 10px;
+}
+
+.page a {
+    text-decoration: none;
+    color: #333;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.page a:hover {
+    background-color: #0800ff;
+    color: white;
+}
+
+.Type {
+    margin-top: 60px;
+    padding: 20px;
+}
+
+.Type h2 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.food-list {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.food-list li {
+    list-style: none;
+    text-align: center;
+}
+
+.food-list img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.food-list img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.food-list a {
+    display: block;
+    margin-top: 10px;
+    font-size: 18px;
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.food-list a:hover {
+    color: #0800ff;
+}
+
+
+.dsSanpham .page {
+    margin-top: 30px;
+    text-align: center;
+    width: 100%;
+}

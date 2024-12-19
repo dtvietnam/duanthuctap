@@ -1,0 +1,113 @@
+  body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+  }
+
+  .container {
+      position: relative;
+      top: 10%;
+      display: flex;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-image {
+      flex: 1;
+      padding-right: 20px;
+  }
+
+  .product-image img {
+      max-width: 100%;
+      border-radius: 8px;
+  }
+
+  .product-details {
+      flex: 1;
+      width: 100%;
+      width: 700px;
+  }
+
+  .product-details h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+  }
+
+  .product-details p {
+      color: #666;
+      line-height: 1.6;
+  }
+
+  .product-details .price {
+      font-size: 24px;
+      color: #6c63ff;
+      margin: 20px 0;
+  }
+
+  .product-details .size-options {
+      margin-bottom: 20px;
+  }
+
+  .product-details .size-options label {
+      margin-right: 10px;
+  }
+
+  .product-details .quantity {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+  }
+
+  .product-details .quantity button {
+      background-color: #e0e0e0;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+  }
+
+  .product-details .quantity input {
+      width: 40px;
+      text-align: center;
+      border: 1px solid #e0e0e0;
+      margin: 0 5px;
+  }
+
+  .product-details .add-to-cart {
+      background-color: #6c63ff;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background-color 0.4s;
+
+  }
+
+  .product-details .add-to-cart:hover {
+      background-color: coral;
+
+  }
+
+  @media (max-width: 768px) {
+      .container {
+          flex-direction: column;
+          align-items: center;
+      }
+
+      .product-image,
+      .product-details {
+          padding: 0;
+      }
+
+      s .product-details {
+          text-align: center;
+      }
+  }

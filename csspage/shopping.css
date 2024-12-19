@@ -1,0 +1,156 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    position: relative;
+    top: 50px;
+}
+
+.container {
+    width: 80%;
+    margin: 20px auto;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+th,
+td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.product-image {
+    width: 80px;
+    height: auto;
+    border-radius: 5px;
+}
+
+.checkout-form {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.checkout-form label {
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.checkout-form input {
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.checkout-button {
+    padding: 12px 25px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #ff8c00;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.checkout-button:hover {
+    background-color: #ffa500;
+}
+
+.quantity-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px; /* Khoảng cách giữa các thành phần */
+}
+
+.quantity-input {
+    width: 50px; /* Độ rộng trường nhập số */
+    text-align: center;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    height: 20px;
+}
+
+.quantity-input:invalid {
+    border-color: red;
+}
+
+.quantity-btn {
+    width: 20px;
+    height: 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #333;
+    font-size: 14px;
+    text-align: center;
+    line-height: 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.quantity-btn:hover {
+    background-color: #e0e0e0;
+    border-color: #aaa;
+}
+
+.quantity-btn:active {
+    background-color: #ccc;
+}
+
+.add {
+    padding: 1%;
+}
+
+.active {
+    color: #0800ff;
+    background-color: rgba(0, 128, 255, 0.1);
+}
+
+.sex {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sex p {
+    margin: 0 20px 0 0;
+    font-weight: bold;
+}
+
+.sex label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
