@@ -3,8 +3,9 @@ require_once '../database/connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $phone = $_POST['phone'];
-
-    $stmt = $conn->prepare("SELECT * FROM customer WHERE phone = ?");
+    $normalizedPhone = preg_replace('/^0/', '+84', $phone);
+    
+    $stmt = $conn->prepare("SELECT * FROM customer WHERE customer_id = ?");
     $stmt->bind_param("s", $phone);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -15,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         exit();
     } else {
         $account = $result->fetch_assoc();
+        session_start();
         $_SESSION['customer_id'] = $account['customer_id'];
         if ($account['role_id'] == 2) {
             header("Location: ../Quanly/sanpham.php");
@@ -45,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 <div class="number-input">
                     <label for="phone">Số điện thoại</label>
                     <input type="text" id="phone" name="phone" required>
-                    <div id="recaptcha-container"></div>
                     <button id="sendOtpBtn" type="button">Xác nhận số điện thoại</button>
                 </div>
                 <div class="otp-verification" style="display: none;">

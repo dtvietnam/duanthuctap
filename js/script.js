@@ -11,54 +11,49 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Render the reCAPTCHA verifier
-function render() {
-  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-      'size': 'normal',
-      'callback': function(response) {
-          console.log("reCAPTCHA solved, you can proceed with phone number verification.");
-      },
-      'expired-callback': function() {
-          console.log("reCAPTCHA expired, please solve it again.");
-      }
-  });
-  recaptchaVerifier.render();
+// Setup invisible reCAPTCHA
+window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendOtpBtn', {
+  'size': 'invisible',
+  'callback': function(response) {
+    // reCAPTCHA solved, allow signInWithPhoneNumber.
+  },
+  'expired-callback': function() {
+    // Response expired. Ask user to solve reCAPTCHA again.
+  }
+});
+
+function sendOTP() {
+  var phoneNumber = document.getElementById('phone').value;
+  // Sử dụng định dạng số điện thoại quốc tế
+  var formattedPhoneNumber = "+84" + phoneNumber.replace(/^0/, '');
+
+  var appVerifier = window.recaptchaVerifier;
+  firebase.auth().signInWithPhoneNumber(formattedPhoneNumber, appVerifier)
+    .then(function(confirmationResult) {
+      window.confirmationResult = confirmationResult;
+      document.querySelector('.number-input').style.display = 'none';
+      document.querySelector('.otp-verification').style.display = 'block';
+      console.log("OTP sent successfully.");
+    })
+    .catch(function(error) {
+      console.error("Error during signInWithPhoneNumber", error);
+      alert(error.message);
+    });
 }
 
-// Send OTP
-document.getElementById('sendOtpBtn').onclick = function() {
-  var phoneNumber = document.getElementById('phone').value;
-  var appVerifier = window.recaptchaVerifier;
-
-  firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-      .then(function(confirmationResult) {
-          window.confirmationResult = confirmationResult;
-          document.querySelector('.number-input').style.display = 'none';
-          document.querySelector('.otp-verification').style.display = 'block';
-          console.log("OTP sent successfully.");
-      })
-      .catch(function(error) {
-          console.error("Error during signInWithPhoneNumber", error);
-          alert(error.message);
-      });
-};
-
-// Verify OTP
-document.getElementById('verifyOtpBtn').onclick = function() {
+function verifyOTP() {
   var code = document.getElementById('verificationCode').value;
   window.confirmationResult.confirm(code)
-      .then(function(result) {
-          document.querySelector('.otp-verification').style.display = 'none';
-          // Sau khi OTP đã được xác nhận, kích hoạt nút đăng nhập để kiểm tra số điện thoại và chuyển hướng
-          document.getElementById('loginBtn').click();
-      })
-      .catch(function(error) {
-          document.getElementById('otpErrorMessage').style.display = 'block';
-          console.error("Error during OTP verification", error);
-      });
-};
+    .then(function(result) {
+      document.querySelector('.otp-verification').style.display = 'none';
+      // Sau khi OTP đã được xác nhận, kích hoạt nút đăng nhập để kiểm tra số điện thoại và chuyển hướng
+      document.getElementById('loginBtn').click();
+    })
+    .catch(function(error) {
+      document.getElementById('otpErrorMessage').style.display = 'block';
+      console.error("Error during OTP verification", error);
+    });
+}
 
-// Render reCAPTCHA on page load
-window.onload = function() {
-  render();
-};
+document.getElementById('sendOtpBtn').onclick = sendOTP;
+document.getElementById('verifyOtpBtn').onclick = verifyOTP;

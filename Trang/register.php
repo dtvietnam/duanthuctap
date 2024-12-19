@@ -1,5 +1,6 @@
 <?php
 require '../database/connect.php';
+session_start();
 
 if (isset($_GET['phone'])) {
     $_SESSION['phone'] = $_GET['phone'];
@@ -11,14 +12,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = $_SESSION['phone'];
     $gmail = $_POST['gmail'];
 
-    $stmt = $conn->prepare("INSERT INTO customer (customer_name, address, phone, gmail, role_id) VALUES (?, ?, ?, ?, 1)");
-    $stmt->bind_param("ssss", $name, $address, $phone, $gmail);
+    $stmt = $conn->prepare("INSERT INTO customer (customer_id, customer_name, address, gmail, role_id) VALUES (?, ?, ?, ?, 1)");
+    $stmt->bind_param("ssss", $phone, $name, $address, $gmail);
     $stmt->execute();
 
     header('Location: shopping.php');
     exit();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
