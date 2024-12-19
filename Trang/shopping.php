@@ -196,7 +196,7 @@ error_reporting(E_ALL);
                         <td>
                             <div>
                                 <label for="description">Ghi chú</label><br>
-                                <textarea rows="4" cols="30" id="dedescription" name="dedescription"
+                                <textarea style="resize: none;" rows="7" cols="70" id="dedescription" name="dedescription"
                                     placeholder="Nhập yêu cầu của bạn"></textarea><br>
                             </div>
                         </td>

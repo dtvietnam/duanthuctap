@@ -4,7 +4,7 @@ require_once '../database/connect.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $phone = $_POST['phone'];
     $normalizedPhone = preg_replace('/^0/', '+84', $phone);
-    
+
     $stmt = $conn->prepare("SELECT * FROM customer WHERE customer_id = ?");
     $stmt->bind_param("s", $phone);
     $stmt->execute();
@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
