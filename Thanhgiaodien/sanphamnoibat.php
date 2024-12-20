@@ -36,10 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
 $total = "SELECT count( DISTINCT product_id) AS total FROM product";
 $result_total = mysqli_query($conn, $total);
 $total_product = mysqli_fetch_assoc($result_total)['total'];
-$begin_product = max(0, $total_product - 8);
+$begin_product = max(0, $total_product - 9);
 
-$product = "SELECT * FROM `product` ORDER BY create_at DESC LIMIT $begin_product,8";
-$result = mysqli_query($conn, $product);
+$product = "SELECT * FROM product ORDER BY create_at DESC LIMIT ?, 9";
+$query_type = $conn->prepare($product);
+$query_type->bind_param("i", $begin_product);
+$query_type->execute();
+$result_type = $query_type->get_result();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,68 +74,60 @@ $result = mysqli_query($conn, $product);
             flex-wrap: wrap;
             gap: 20px;
             justify-content: center;
+            align-items: center;
         }
 
-        .sp {
-            width: 22%;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            text-align: center;
-            background-color: #f9f9f9;
+        .dsSanpham {
+            width: 70%;
+            padding: 20px;
         }
 
-        .image1 {
-            padding-top: 10px;
-            width: 300px;
-            height: 300px;
-            overflow: hidden;
-            margin: 0 auto;
+        .item {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
         }
 
-        .image1 img {
+        .image img {
             width: 100%;
-            height: 100%;
+            height: 250px;
             object-fit: cover;
+            border-radius: 10px;
         }
 
         .text {
-            padding: 10px;
-            background-color: #fff;
-            font-size: 14px;
+            text-align: center;
         }
 
-        .text .name {
+        .name {
+            font-size: 18px;
             font-weight: bold;
             margin: 10px 0;
         }
 
         .button {
-            padding: 10px 20px;
-            background-color: #007bff;
+            background-color: #0800ff;
             color: white;
+            padding: 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            text-transform: uppercase;
-            font-size: 14px;
             margin-top: 15px;
+            transition: background-color 0.3s;
         }
 
         .button:hover {
-            background-color: #0056b3;
+            background-color: #0066cc;
         }
 
         @media (max-width: 1200px) {
-            .sp {
+            .dsSanpham {
                 width: 48%;
             }
         }
 
         @media (max-width: 768px) {
-            .sp {
+            .dsSanpham {
                 width: 100%;
             }
         }
@@ -143,31 +138,73 @@ $result = mysqli_query($conn, $product);
     <div class="sanphamnoibat">
         <h2>Sản phẩm nổi bật</h2>
         <div class="product-container">
-            <?php while ($row = mysqli_fetch_assoc($result)): ?>
-                <div class="sp">
-                    <div class="image1">
-                        <a href="../Trang/ctsp.php?id=<?= $row['product_id'] ?>">
-                            <img src="../anh/<?= $row['img'] ?>" alt="">
-                        </a>
-                    </div>
-                    <div class="text">
-                        <a class="name" href="../Trang/ctsp.php?id=<?= $row['product_id'] ?>">
-                            <?= htmlspecialchars($row['product_name']); ?>
-                        </a>
-                        <p class="name">Giá: <?= number_format($row['price']); ?> VNĐ</p>
-
-                        <form method="POST" action="">
-                            <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
-                            <input type="hidden" name="product_name" value="<?= htmlspecialchars($row['product_name']); ?>">
-                            <input type="hidden" name="price" value="<?= $row['price'] ?>">
-                            <input type="hidden" name="img" value="<?= htmlspecialchars($row['img']); ?>">
-                            <button type="submit" name="add_to_cart" class="button">Thêm vào Giỏ hàng</button>
-                        </form>
-                    </div>
+            <div class="dsSanpham">
+                <div class="item" id="product-list">
+                    <?php if ($result_type && $result_type->num_rows > 0):
+                        while ($row = $result_type->fetch_assoc()): ?>
+                            <div class="image">
+                                <a href="ctsp.php?id=<?= htmlspecialchars($row['product_id']) ?>">
+                                    <img src="../anh/<?= htmlspecialchars($row['img']) ?>"
+                                        alt="<?= htmlspecialchars($row['product_name']) ?>">
+                                </a>
+                                <div class="text">
+                                    <p class="name"><?= htmlspecialchars($row['product_name']) ?></p>
+                                    <p class="price">Giá: <?= htmlspecialchars(number_format($row['price'])) ?> VND</p>
+                                </div>
+                                <button class="add-to-cart" data-product-id="<?= htmlspecialchars($row['product_id']) ?>"
+                                    data-product-name="<?= htmlspecialchars($row['product_name']) ?>"
+                                    data-price="<?= htmlspecialchars($row['price']) ?>"
+                                    data-img="<?= htmlspecialchars($row['img']) ?>"
+                                    data-saleoff-id="<?= htmlspecialchars($row['saleoff_id'] ?? '') ?>">
+                                    Đặt hàng
+                                </button>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <p>Không có sản phẩm nào</p>
+                    <?php endif; ?>
                 </div>
-            <?php endwhile; ?>
+            </div>
         </div>
     </div>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
 
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                const productName = this.getAttribute('data-product-name');
+                const price = this.getAttribute('data-price');
+                const img = this.getAttribute('data-img');
+                const saleoffId = this.getAttribute('data-saleoff-id');
+
+                const formData = new FormData();
+                formData.append('product_id', productId);
+                formData.append('product_name', productName);
+                formData.append('price', price);
+                formData.append('img', img);
+                formData.append('saleoff_id', saleoffId);
+
+                fetch('shop.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                        } else {
+                            alert(data.message || 'Thêm sản phẩm thất bại!');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi. Vui lòng thử lại!');
+                    });
+            });
+        });
+    });
+</script>
 </html>

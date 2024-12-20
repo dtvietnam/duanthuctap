@@ -39,7 +39,8 @@ if (!$result1) {
                     <ul class="food-list">
                         <li>
                             <img src="../anh/<?= $row1['type_img']; ?>" alt="<?= $row1['type_name']; ?>">
-                            <a href="../Trang/shop.php?type_id=<?= $row1['type_id']; ?>"><?= $row1['type_name']; ?></a>
+                            <a href='shop.php?type=<?= htmlspecialchars($row1['type_id']) ?>' 
+                            name="type_products" class='filter-type'><?= htmlspecialchars($row1['type_name']) ?></a>
                         </li>
                     </ul>
                 </div>
