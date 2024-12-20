@@ -1,11 +1,11 @@
 <?php
 global $conn;
-include '../database/connect.php';
+require '../database/connect.php';
 
 // Xử lý thêm sản phẩm vào giỏ hàng
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
     header('Content-Type: application/json; charset=utf-8');
-    
+
     $product_id = $_POST['product_id'];
     $product_name = $_POST['product_name'];
     $price = $_POST['price'];
@@ -48,17 +48,26 @@ $totalProducts = $row_total_products['total'];
 
 // Tính số trang tối đa
 $maxPage = ceil($totalProducts / $rowsPerPage);
-$type_id = isset($_GET['type_id']) ? (int) $_GET['type_id'] : 0;
 
-// Truy vấn sản phẩm theo type_id
-$sql = "SELECT * FROM product";
-if ($type_id > 0) {
-    $sql .= " WHERE type_id = $type_id"; // Lọc theo loại sản phẩm
+// Lấy loại sản phẩm
+$type_id = isset($_GET['type']) ? (int) $_GET['type'] : 0;
+if ($type_id < 0) {
+    $type_id = 0;
 }
-$sql .= " LIMIT $offset, $rowsPerPage";
 
-$result = mysqli_query($conn, $sql);
+// Xây dựng truy vấn sản phẩm
+if ($type_id > 0) {
+    $sql_query = "SELECT * FROM product WHERE type_id = ? LIMIT ?, ?";
+    $query_type = $conn->prepare($sql_query);
+    $query_type->bind_param("iii", $type_id, $offset, $rowsPerPage);
+} else {
+    $sql_query = "SELECT * FROM product LIMIT ?, ?";
+    $query_type = $conn->prepare($sql_query);
+    $query_type->bind_param("ii", $offset, $rowsPerPage);
+}
 
+$query_type->execute();
+$result_type = $query_type->get_result();
 
 ?>
 <!DOCTYPE html>
@@ -81,16 +90,15 @@ $result = mysqli_query($conn, $sql);
             <ul class="type-list">
                 <?php
                 $sql_type = "SELECT * FROM type";
-                $result_type = mysqli_query($conn, $sql_type);
+                $result_types = mysqli_query($conn, $sql_type);
 
-                if (mysqli_num_rows($result_type) > 0) {
-                    while ($row = mysqli_fetch_assoc($result_type)) {
+                if (mysqli_num_rows($result_types) > 0):
+                    while ($row = mysqli_fetch_assoc($result_types)):
                         $type_id = $row['type_id'];
-                        $type_name = $row['type_name'];
-                        echo "<li><a href='#' data-type-id='{$type_id}' class='filter-type'>{$type_name}</a></li>";
-                    }
-                }
-                ?>
+                        $type_name = $row['type_name']; ?>
+                        <li><a href='shop.php?type=<?= htmlspecialchars($type_id) ?>' name="type_products" class='filter-type'><?= htmlspecialchars($type_name) ?></a></li>
+                    <?php endwhile; ?>
+                <?php endif; ?>
             </ul>
             <h1>Giá thành</h1>
             <ul class="price-list">
@@ -103,20 +111,21 @@ $result = mysqli_query($conn, $sql);
         </div>
         <div class="dsSanpham">
             <div class="item" id="product-list">
-                <?php if (mysqli_num_rows($result) > 0): ?>
-                    <?php while ($product = mysqli_fetch_assoc($result)): ?>
-                        
+                <?php if ($result_type && $result_type->num_rows > 0):
+                    while ($row = $result_type->fetch_assoc()): ?>
                         <div class="image">
-                            <a href="ctsp.php?id=<?= htmlspecialchars($product['product_id']) ?>"><img
-                                    src="../anh/<?= htmlspecialchars($product['img']) ?>" alt="<?= htmlspecialchars($product['product_name']) ?>"></a>
+                            <a href="ctsp.php?id=<?= htmlspecialchars($row['product_id']) ?>">
+                                <img src="../anh/<?= htmlspecialchars($row['img']) ?>" alt="<?= htmlspecialchars($row['product_name']) ?>">
+                            </a>
                             <div class="text">
-                                <p class="name"><?= htmlspecialchars($product['product_name']) ?></p>
-                                <p class="price">Giá: <?= htmlspecialchars(number_format($product['price'])) ?> VND</p>
+                                <p class="name"><?= htmlspecialchars($row['product_name']) ?></p>
+                                <p class="price">Giá: <?= htmlspecialchars(number_format($row['price'])) ?> VND</p>
                             </div>
-                            <button class="add-to-cart" data-product-id="<?= htmlspecialchars($product['product_id']) ?>"
-                                data-product-name="<?= htmlspecialchars($product['product_name']) ?>"
-                                data-price="<?= htmlspecialchars($product['price']) ?>" data-img="<?= htmlspecialchars($product['img']) ?>"
-                                data-saleoff-id="<?= htmlspecialchars($product['saleoff_id']) ?>">
+                            <button class="add-to-cart" data-product-id="<?= htmlspecialchars($row['product_id']) ?>"
+                                data-product-name="<?= htmlspecialchars($row['product_name']) ?>"
+                                data-price="<?= htmlspecialchars($row['price']) ?>"
+                                data-img="<?= htmlspecialchars($row['img']) ?>"
+                                data-saleoff-id="<?= htmlspecialchars($row['saleoff_id'] ?? '') ?>">
                                 Đặt hàng
                             </button>
                         </div>
@@ -154,44 +163,43 @@ $result = mysqli_query($conn, $sql);
 </body>
 <?php include '../Thanhgiaodien/footer.php'; ?>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    document.addEventListener('DOMContentLoaded', function () {
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
 
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
-            const productName = this.getAttribute('data-product-name');
-            const price = this.getAttribute('data-price');
-            const img = this.getAttribute('data-img');
-            const saleoffId = this.getAttribute('data-saleoff-id');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                const productName = this.getAttribute('data-product-name');
+                const price = this.getAttribute('data-price');
+                const img = this.getAttribute('data-img');
+                const saleoffId = this.getAttribute('data-saleoff-id');
 
-            const formData = new FormData();
-            formData.append('product_id', productId);
-            formData.append('product_name', productName);
-            formData.append('price', price);
-            formData.append('img', img);
-            formData.append('saleoff_id', saleoffId);
+                const formData = new FormData();
+                formData.append('product_id', productId);
+                formData.append('product_name', productName);
+                formData.append('price', price);
+                formData.append('img', img);
+                formData.append('saleoff_id', saleoffId);
 
-            fetch('shop.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                } else {
-                    alert(data.message || 'Thêm sản phẩm thất bại!');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Đã xảy ra lỗi. Vui lòng thử lại!');
+                fetch('shop.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                        } else {
+                            alert(data.message || 'Thêm sản phẩm thất bại!');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi. Vui lòng thử lại!');
+                    });
             });
         });
     });
-});
-
 </script>
 
 </html>

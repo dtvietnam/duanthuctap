@@ -1,6 +1,6 @@
 <?php
 ob_start();
-// include '../Thanhgiaodien/header.php';
+include '../Thanhgiaodien/header.php';
 include '../database/connect.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);

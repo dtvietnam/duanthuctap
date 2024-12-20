@@ -28,7 +28,6 @@ if (isset($_GET['logout'])) {
             <div class="header list">
                 <li><a href="../Trang/home.php">Trang Chủ</a></li>
                 <li><a href="../Trang/Shop.php">Shop</a></li>
-                <li><a href="../Trang/about.php">About us</a></li>
                 <li><a href="../Trang/contact.php">Contact us</a></li>
             </div>
             <div class="header icon">

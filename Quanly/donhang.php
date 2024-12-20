@@ -62,26 +62,26 @@ if (!$query) {
                     if (mysqli_num_rows($query) > 0) {
 
                         while ($row = mysqli_fetch_assoc($query)) { ?>
-                            <tr>
-                                <td><?= $row['phone'] ?></td>
-                                <td><?= $row['customer_name'] ?></td>
-                                <td><?= $row['oder_id'] ?></td>
-                                <td><?= $row['oder_date'] ?></td>
-                                <td><?= $row['address'] ?></td>
-                                <td><?= $row['description'] ?></td>
-                                <td><?= $row['status_name'] ?></td>
-                                <td>
-                                    <button class="btn">
-                                        <a href="suahd.php?id=<?= $row['oder_id'] ?>"
-                                            style="text-decoration:none; color:inherit;">Sửa</a>
-                                    </button>
+                    <tr>
+                        <td><?= $row['phone_number'] ?></td>
+                        <td><?= $row['customer_name'] ?></td>
+                        <td><?= $row['oder_id'] ?></td>
+                        <td><?= $row['oder_date'] ?></td>
+                        <td><?= $row['address'] ?></td>
+                        <td><?= $row['description'] ?></td>
+                        <td><?= $row['status_name'] ?></td>
+                        <td>
+                            <button class="btn">
+                                <a href="suahd.php?id=<?= $row['oder_id'] ?>"
+                                    style="text-decoration:none; color:inherit;">Sửa</a>
+                            </button>
 
-                                    <button class="btn">
-                                        <a onclick="return Delete('hóa đơn')" href="xoahd.php?id=<?= $row['oder_id']; ?>"
-                                            style="text-decoration:none; color:inherit;">Xóa</a>
-                                    </button>
-                                </td>
-                            </tr>
+                            <button class="btn">
+                                <a onclick="return Delete('hóa đơn')" href="xoahd.php?id=<?= $row['oder_id']; ?>"
+                                    style="text-decoration:none; color:inherit;">Xóa</a>
+                            </button>
+                        </td>
+                    </tr>
 
                     <?php }
                     } else {
@@ -96,9 +96,9 @@ if (!$query) {
     </div>
 </body>
 <script>
-    function Delete(name) {
-        return confirm(" Bạn có chắc muốn xóa " + name + " này khô  ng?");
-    }
+function Delete(name) {
+    return confirm(" Bạn có chắc muốn xóa " + name + " này khô  ng?");
+}
 </script>
 
 </html>

@@ -1,3 +1,46 @@
+<?php
+require "../database/connect.php";
+
+// Initialize shopping cart session if not set
+if (!isset($_SESSION['giohang'])) {
+    $_SESSION['giohang'] = [];
+}
+
+// Handle adding product to the cart
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
+    $product_id = $_POST['product_id'];
+    $product_name = $_POST['product_name'];
+    $price = $_POST['price'];
+    $img = $_POST['img'];
+
+    // Check if the product is already in the cart
+    if (!isset($_SESSION['giohang'][$product_id])) {
+        $_SESSION['giohang'][$product_id] = [
+            'product_id' => $product_id,
+            'product_name' => $product_name,
+            'price' => $price,
+            'img' => $img,
+            'quantity' => 1
+        ];
+    } else {
+        // Increment quantity if already in cart
+        $_SESSION['giohang'][$product_id]['quantity']++;
+    }
+
+    // Redirect to avoid form resubmission
+    header("Location: {$_SERVER['PHP_SELF']}");
+    exit();
+}
+
+// Fetch products
+$total = "SELECT count( DISTINCT product_id) AS total FROM product";
+$result_total = mysqli_query($conn, $total);
+$total_product = mysqli_fetch_assoc($result_total)['total'];
+$begin_product = max(0, $total_product - 8);
+
+$product = "SELECT * FROM `product` ORDER BY create_at DESC LIMIT $begin_product,8";
+$result = mysqli_query($conn, $product);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -95,34 +138,34 @@
         }
     </style>
 </head>
-<?php
-require "../database/connect.php";
-$total="SELECT count( DISTINCT product_id) AS total FROM product";
-$result_total= mysqli_query($conn,$total);
-$total_product = mysqli_fetch_assoc($result_total)['total'];
-$begin_product = max(0, $total_product - 8);
 
-$product = "SELECT * FROM `product` ORDER BY create_at DESC LIMIT $begin_product,8";
-$result = mysqli_query($conn, $product);
-?>
 <body>
     <div class="sanphamnoibat">
         <h2>Sản phẩm nổi bật</h2>
         <div class="product-container">
-            <?php while($row = mysqli_fetch_assoc($result)): ?>
+            <?php while ($row = mysqli_fetch_assoc($result)): ?>
                 <div class="sp">
-                <div class="image1">
-                    <a  href="../Trang/ctsp.php?id=<?= $row['product_id'] ?>"><img  src="../anh/<?= $row['img'] ?>" alt=""></a>
-                </div>
-                <div class="text">
-                    <a class="name" href="../Trang/ctsp.php?id=<?= $row['product_id'] ?>"><?=  htmlspecialchars($row['product_name']); ?></a>
-                    <a class="name" href="../Trang/ctsp.php?id=<?= $row['product_id'] ?>"><?=  htmlspecialchars($row['price']); ?></a>
-                    <button class="button">Mua Ngay</button>
-                    <button class="button">Thêm vào Giỏ hàng</button>
-                </div>
-            </div>
-            <?php endwhile;?>
+                    <div class="image1">
+                        <a href="../Trang/ctsp.php?id=<?= $row['product_id'] ?>">
+                            <img src="../anh/<?= $row['img'] ?>" alt="">
+                        </a>
+                    </div>
+                    <div class="text">
+                        <a class="name" href="../Trang/ctsp.php?id=<?= $row['product_id'] ?>">
+                            <?= htmlspecialchars($row['product_name']); ?>
+                        </a>
+                        <p class="name">Giá: <?= number_format($row['price']); ?> VNĐ</p>
 
+                        <form method="POST" action="">
+                            <input type="hidden" name="product_id" value="<?= $row['product_id'] ?>">
+                            <input type="hidden" name="product_name" value="<?= htmlspecialchars($row['product_name']); ?>">
+                            <input type="hidden" name="price" value="<?= $row['price'] ?>">
+                            <input type="hidden" name="img" value="<?= htmlspecialchars($row['img']); ?>">
+                            <button type="submit" name="add_to_cart" class="button">Thêm vào Giỏ hàng</button>
+                        </form>
+                    </div>
+                </div>
+            <?php endwhile; ?>
         </div>
     </div>
 </body>
