@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th12 19, 2024 lúc 10:29 AM
--- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: Dec 20, 2024 at 09:23 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,38 +18,38 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Cơ sở dữ liệu: `qlshop`
+-- Database: `qlshop`
 --
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `customer`
+-- Table structure for table `customer`
 --
 
 CREATE TABLE `customer` (
   `customer_id` int(11) NOT NULL,
-  `phone_number` int(11) NOT NULL,
-  `customer_name` varchar(50) NOT NULL,
-  `address` varchar(50) NOT NULL,
-  `gmail` varchar(50) NOT NULL,
+  `phone_number` varchar(11) NOT NULL,
+  `customer_name` varchar(50) DEFAULT NULL,
+  `address` varchar(50) DEFAULT NULL,
+  `gmail` varchar(50) DEFAULT NULL,
   `role_id` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `customer`
+-- Dumping data for table `customer`
 --
 
 INSERT INTO `customer` (`customer_id`, `phone_number`, `customer_name`, `address`, `gmail`, `role_id`) VALUES
-(1, 64852597, 'ert', 'Ninh Hoa,Khánh Hòa', '', 1),
-(2, 1312314, 'anh Hải', 'Ninh Hoa,Khánh Hòa', '', 1),
-(3, 841312314, 'anh Hải', 'Ninh Hoa,Khánh Hòa', '', 1),
-(4, 13132314, 'anh Hải', '20', '', 1);
+(2, '1312314', 'anh Hải', 'Ninh Hoa,Khánh Hòa', '', 1),
+(3, '841312314', 'anh Hải', 'Ninh Hoa,Khánh Hòa', '', 1),
+(4, '13132314', 'anh Hải', '20', '', 1),
+(14, '0962071416', NULL, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `note`
+-- Table structure for table `note`
 --
 
 CREATE TABLE `note` (
@@ -62,7 +62,7 @@ CREATE TABLE `note` (
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `oder`
+-- Table structure for table `oder`
 --
 
 CREATE TABLE `oder` (
@@ -76,7 +76,7 @@ CREATE TABLE `oder` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `oder`
+-- Dumping data for table `oder`
 --
 
 INSERT INTO `oder` (`oder_id`, `address`, `oder_date`, `description`, `status_id`, `customer_id`, `total_price`) VALUES
@@ -88,7 +88,7 @@ INSERT INTO `oder` (`oder_id`, `address`, `oder_date`, `description`, `status_id
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `oder_detail`
+-- Table structure for table `oder_detail`
 --
 
 CREATE TABLE `oder_detail` (
@@ -100,7 +100,7 @@ CREATE TABLE `oder_detail` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `oder_detail`
+-- Dumping data for table `oder_detail`
 --
 
 INSERT INTO `oder_detail` (`detail_id`, `product_id`, `oder_id`, `quantity_oder`, `price_oder`) VALUES
@@ -116,7 +116,7 @@ INSERT INTO `oder_detail` (`detail_id`, `product_id`, `oder_id`, `quantity_oder`
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `product`
+-- Table structure for table `product`
 --
 
 CREATE TABLE `product` (
@@ -132,7 +132,7 @@ CREATE TABLE `product` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `product`
+-- Dumping data for table `product`
 --
 
 INSERT INTO `product` (`product_id`, `product_name`, `describe_product`, `quantity`, `price`, `img`, `create_at`, `type_id`, `saleoff_id`) VALUES
@@ -151,7 +151,7 @@ INSERT INTO `product` (`product_id`, `product_name`, `describe_product`, `quanti
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `role`
+-- Table structure for table `role`
 --
 
 CREATE TABLE `role` (
@@ -160,7 +160,7 @@ CREATE TABLE `role` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `role`
+-- Dumping data for table `role`
 --
 
 INSERT INTO `role` (`role_id`, `role_name`) VALUES
@@ -170,7 +170,7 @@ INSERT INTO `role` (`role_id`, `role_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `saleoff`
+-- Table structure for table `saleoff`
 --
 
 CREATE TABLE `saleoff` (
@@ -179,7 +179,7 @@ CREATE TABLE `saleoff` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `saleoff`
+-- Dumping data for table `saleoff`
 --
 
 INSERT INTO `saleoff` (`saleoff_id`, `sale_name`) VALUES
@@ -188,7 +188,7 @@ INSERT INTO `saleoff` (`saleoff_id`, `sale_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `slide`
+-- Table structure for table `slide`
 --
 
 CREATE TABLE `slide` (
@@ -199,7 +199,7 @@ CREATE TABLE `slide` (
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `status`
+-- Table structure for table `status`
 --
 
 CREATE TABLE `status` (
@@ -208,7 +208,7 @@ CREATE TABLE `status` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `status`
+-- Dumping data for table `status`
 --
 
 INSERT INTO `status` (`status_id`, `status_name`) VALUES
@@ -220,7 +220,7 @@ INSERT INTO `status` (`status_id`, `status_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `type`
+-- Table structure for table `type`
 --
 
 CREATE TABLE `type` (
@@ -230,31 +230,31 @@ CREATE TABLE `type` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `type`
+-- Dumping data for table `type`
 --
 
 INSERT INTO `type` (`type_id`, `type_name`, `type_img`) VALUES
 (23, 'yến', 'Copy of H 1  hồng sâm đông trùng hạ thảo-01.png');
 
 --
--- Chỉ mục cho các bảng đã đổ
+-- Indexes for dumped tables
 --
 
 --
--- Chỉ mục cho bảng `customer`
+-- Indexes for table `customer`
 --
 ALTER TABLE `customer`
   ADD PRIMARY KEY (`customer_id`),
   ADD KEY `role_id` (`role_id`);
 
 --
--- Chỉ mục cho bảng `note`
+-- Indexes for table `note`
 --
 ALTER TABLE `note`
   ADD PRIMARY KEY (`note_id`);
 
 --
--- Chỉ mục cho bảng `oder`
+-- Indexes for table `oder`
 --
 ALTER TABLE `oder`
   ADD PRIMARY KEY (`oder_id`),
@@ -262,7 +262,7 @@ ALTER TABLE `oder`
   ADD KEY `customer_id` (`customer_id`);
 
 --
--- Chỉ mục cho bảng `oder_detail`
+-- Indexes for table `oder_detail`
 --
 ALTER TABLE `oder_detail`
   ADD PRIMARY KEY (`detail_id`),
@@ -270,7 +270,7 @@ ALTER TABLE `oder_detail`
   ADD KEY `oder_detail_ibfk_2` (`oder_id`);
 
 --
--- Chỉ mục cho bảng `product`
+-- Indexes for table `product`
 --
 ALTER TABLE `product`
   ADD PRIMARY KEY (`product_id`),
@@ -278,125 +278,125 @@ ALTER TABLE `product`
   ADD KEY `saleoff_id` (`saleoff_id`);
 
 --
--- Chỉ mục cho bảng `role`
+-- Indexes for table `role`
 --
 ALTER TABLE `role`
   ADD PRIMARY KEY (`role_id`);
 
 --
--- Chỉ mục cho bảng `saleoff`
+-- Indexes for table `saleoff`
 --
 ALTER TABLE `saleoff`
   ADD PRIMARY KEY (`saleoff_id`);
 
 --
--- Chỉ mục cho bảng `slide`
+-- Indexes for table `slide`
 --
 ALTER TABLE `slide`
   ADD PRIMARY KEY (`slide_id`);
 
 --
--- Chỉ mục cho bảng `status`
+-- Indexes for table `status`
 --
 ALTER TABLE `status`
   ADD PRIMARY KEY (`status_id`);
 
 --
--- Chỉ mục cho bảng `type`
+-- Indexes for table `type`
 --
 ALTER TABLE `type`
   ADD PRIMARY KEY (`type_id`);
 
 --
--- AUTO_INCREMENT cho các bảng đã đổ
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT cho bảng `customer`
+-- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
--- AUTO_INCREMENT cho bảng `note`
+-- AUTO_INCREMENT for table `note`
 --
 ALTER TABLE `note`
   MODIFY `note_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT cho bảng `oder`
+-- AUTO_INCREMENT for table `oder`
 --
 ALTER TABLE `oder`
   MODIFY `oder_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
--- AUTO_INCREMENT cho bảng `oder_detail`
+-- AUTO_INCREMENT for table `oder_detail`
 --
 ALTER TABLE `oder_detail`
   MODIFY `detail_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
--- AUTO_INCREMENT cho bảng `product`
+-- AUTO_INCREMENT for table `product`
 --
 ALTER TABLE `product`
   MODIFY `product_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
--- AUTO_INCREMENT cho bảng `role`
+-- AUTO_INCREMENT for table `role`
 --
 ALTER TABLE `role`
   MODIFY `role_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT cho bảng `saleoff`
+-- AUTO_INCREMENT for table `saleoff`
 --
 ALTER TABLE `saleoff`
   MODIFY `saleoff_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- AUTO_INCREMENT cho bảng `slide`
+-- AUTO_INCREMENT for table `slide`
 --
 ALTER TABLE `slide`
   MODIFY `slide_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT cho bảng `status`
+-- AUTO_INCREMENT for table `status`
 --
 ALTER TABLE `status`
   MODIFY `status_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT cho bảng `type`
+-- AUTO_INCREMENT for table `type`
 --
 ALTER TABLE `type`
   MODIFY `type_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
--- Các ràng buộc cho các bảng đã đổ
+-- Constraints for dumped tables
 --
 
 --
--- Các ràng buộc cho bảng `customer`
+-- Constraints for table `customer`
 --
 ALTER TABLE `customer`
   ADD CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`);
 
 --
--- Các ràng buộc cho bảng `oder`
+-- Constraints for table `oder`
 --
 ALTER TABLE `oder`
   ADD CONSTRAINT `oder_ibfk_1` FOREIGN KEY (`status_id`) REFERENCES `status` (`status_id`),
   ADD CONSTRAINT `order_customer` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`);
 
 --
--- Các ràng buộc cho bảng `oder_detail`
+-- Constraints for table `oder_detail`
 --
 ALTER TABLE `oder_detail`
   ADD CONSTRAINT `oder_detail_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product` (`product_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `oder_detail_ibfk_2` FOREIGN KEY (`oder_id`) REFERENCES `oder` (`oder_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Các ràng buộc cho bảng `product`
+-- Constraints for table `product`
 --
 ALTER TABLE `product`
   ADD CONSTRAINT `product_ibfk_1` FOREIGN KEY (`type_id`) REFERENCES `type` (`type_id`),
