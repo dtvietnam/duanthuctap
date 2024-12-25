@@ -1,43 +1,34 @@
 <?php
 require "../database/connect.php";
-// Kiểm tra xem có tồn tại giỏ hàng chưa
-if (!isset($_SESSION['giohang']) || !is_array($_SESSION['giohang'])) {
+
+// Initialize shopping cart session if not set
+if (!isset($_SESSION['giohang'])) {
     $_SESSION['giohang'] = [];
 }
 
-// Xử lý thêm sản phẩm vào giỏ hàng
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
-    header('Content-Type: application/json; charset=utf-8');
-
+// Handle adding product to the cart
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     $product_id = $_POST['product_id'];
     $product_name = $_POST['product_name'];
     $price = $_POST['price'];
     $img = $_POST['img'];
-    $saleoff_id = $_POST['saleoff_id'];
-    $quantity = $_POST['quantity']?? 1;
-    foreach($_SESSION['giohang'] as $index=>$item){
-        
-    }
-    $sanpham = [
-        'product_id' => $product_id,
-        'product_name' => $product_name,
-        'price' => $price,
-        'img' => $img,
-        'saleoff_id' => $saleoff_id,
-        'quantity' => $quantity
-    ];
-    
-    // Kiểm tra sản phẩm đã tồn tại chưa
-    if (isset($_SESSION['giohang'][$product_id])) {
-        $_SESSION['giohang'][$product_id]['quantity'] += $quantity;
+
+    // Check if the product is already in the cart
+    if (!isset($_SESSION['giohang'][$product_id])) {
+        $_SESSION['giohang'][$product_id] = [
+            'product_id' => $product_id,
+            'product_name' => $product_name,
+            'price' => $price,
+            'img' => $img,
+            'quantity' => 1
+        ];
     } else {
-        $_SESSION['giohang'][$product_id] = $sanpham;
+        // Increment quantity if already in cart
+        $_SESSION['giohang'][$product_id]['quantity']++;
     }
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'Thêm sản phẩm vào giỏ hàng thành công!'
-    ]);
+    // Redirect to avoid form resubmission
+    header("Location: {$_SERVER['PHP_SELF']}");
     exit();
 }
 
@@ -164,8 +155,7 @@ $result_type = $query_type->get_result();
                                     data-product-name="<?= htmlspecialchars($row['product_name']) ?>"
                                     data-price="<?= htmlspecialchars($row['price']) ?>"
                                     data-img="<?= htmlspecialchars($row['img']) ?>"
-                                    data-saleoff-id="<?= htmlspecialchars($row['saleoff_id'] ?? '') ?>"
-                                    data-quantity="<?= htmlspecialchars(1) ?>">
+                                    data-saleoff-id="<?= htmlspecialchars($row['saleoff_id'] ?? '') ?>">
                                     Đặt hàng
                                 </button>
                             </div>
@@ -189,8 +179,6 @@ $result_type = $query_type->get_result();
                 const price = this.getAttribute('data-price');
                 const img = this.getAttribute('data-img');
                 const saleoffId = this.getAttribute('data-saleoff-id');
-                const quantity = this.getAttribute('data-quantity');
-
 
                 const formData = new FormData();
                 formData.append('product_id', productId);
@@ -198,8 +186,6 @@ $result_type = $query_type->get_result();
                 formData.append('price', price);
                 formData.append('img', img);
                 formData.append('saleoff_id', saleoffId);
-                formData.append('quantity', quantity);
-
 
                 fetch('shop.php', {
                     method: 'POST',

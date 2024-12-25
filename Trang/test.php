@@ -50,36 +50,56 @@ $maxPage = ceil($totalProducts / $rowsPerPage);
 
 // Lấy loại sản phẩm
 $type_id = isset($_GET['type']) ? (int) $_GET['type'] : 0;
+if ($type_id < 0) {
+    $type_id = 0;
+}
+
+// Lấy tham số lọc giá
 $price_filter = isset($_GET['price_filter']) ? $_GET['price_filter'] : '';
+$price_condition = '';
+
+// Tạo điều kiện lọc giá
+switch ($price_filter) {
+    case 'asc':
+        $price_condition = 'ORDER BY price ASC';
+        break;
+    case 'desc':
+        $price_condition = 'ORDER BY price DESC';
+        break;
+    case 'below_1000000':
+        $price_condition = 'AND price < 1000000';
+        break;
+    case '1000000_2000000':
+        $price_condition = 'AND price BETWEEN 1000000 AND 2000000';
+        break;
+    case 'above_2000000':
+        $price_condition = 'AND price > 2000000';
+        break;
+    default:
+        $price_condition = '';
+        break;
+}
 
 // Xây dựng truy vấn sản phẩm
-if ($type_id > 0 && $price_filter === '') {
-    $sql_query = "SELECT * FROM product WHERE type_id = ? LIMIT ?, ?";
-    $query_type = $conn->prepare($sql_query);
-    $query_type->bind_param("iii", $type_id, $offset, $rowsPerPage);
-} else if ($price_filter !== '') {
-    if ($price_filter === 'asc') {
-        $sql_query = "SELECT * FROM product ORDER BY price ASC LIMIT ?, ?";
-    } elseif ($price_filter === 'desc') {
-        $sql_query = "SELECT * FROM product ORDER BY price DESC LIMIT ?, ?";
-    } elseif ($price_filter === 'below_1000000') {
-        $sql_query = "SELECT * FROM product WHERE price < 1000000 LIMIT ?, ?";
-    } elseif ($price_filter === '1000000_2000000') {
-        $sql_query = "SELECT * FROM product WHERE price BETWEEN 1000000 AND 2000000 LIMIT ?, ?";
-    } elseif ($price_filter === 'above_2000000') {
-        $sql_query = "SELECT * FROM product WHERE price > 2000000 LIMIT ?, ?";
-    }
+$sql_query = "SELECT * FROM product WHERE 1=1";
+if ($type_id > 0) {
+    $sql_query .= " AND type_id = ?";
+}
+if (!empty($price_condition)) {
+    $sql_query .= " " . $price_condition;
+}
+$sql_query .= " LIMIT ?, ?";
 
-    $query_type = $conn->prepare($sql_query);
-    $query_type->bind_param("ii", $offset, $rowsPerPage);
+$query_type = $conn->prepare($sql_query);
+if ($type_id > 0) {
+    $query_type->bind_param("iii", $type_id, $offset, $rowsPerPage);
 } else {
-    $sql_query = "SELECT * FROM product LIMIT ?, ?";
-    $query_type = $conn->prepare($sql_query);
     $query_type->bind_param("ii", $offset, $rowsPerPage);
 }
 
 $query_type->execute();
 $result_type = $query_type->get_result();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -107,17 +127,17 @@ $result_type = $query_type->get_result();
                     while ($row = mysqli_fetch_assoc($result_types)):
                         $type_id = $row['type_id'];
                         $type_name = $row['type_name']; ?>
-                        <li><a href='shop.php?type=<?= htmlspecialchars($type_id) ?>' name="type_products" class='filter-type'><?= htmlspecialchars($type_name) ?></a></li>
+                        <li><a href='shop.php?type=<?= htmlspecialchars($type_id) ?>&price_filter=<?= htmlspecialchars($price_filter) ?>' class='filter-type'><?= htmlspecialchars($type_name) ?></a></li>
                     <?php endwhile; ?>
                 <?php endif; ?>
             </ul>
             <h1>Giá thành</h1>
             <ul class="price-list">
-                <li><a href="shop.php?price_filter=asc" class="filter-price">Thấp đến cao</a></li>
-                <li><a href="shop.php?price_filter=desc" class="filter-price">Cao đến thấp</a></li>
-                <li><a href="shop.php?price_filter=below_1000000" class="filter-price">Dưới 1.000.000đ</a></li>
-                <li><a href="shop.php?price_filter=1000000_2000000" class="filter-price">Từ 1.000.000đ đến 2.000.000đ</a></li>
-                <li><a href="shop.php?price_filter=above_2000000" class="filter-price">Trên 2.000.000đ</a></li>
+                <li><a href="shop.php?price_filter=asc&type=<?= htmlspecialchars($type_id) ?>" class="filter-price">Thấp đến cao</a></li>
+                <li><a href="shop.php?price_filter=desc&type=<?= htmlspecialchars($type_id) ?>" class="filter-price">Cao đến thấp</a></li>
+                <li><a href="shop.php?price_filter=below_1000000&type=<?= htmlspecialchars($type_id) ?>" class="filter-price">Dưới 1.000.000đ</a></li>
+                <li><a href="shop.php?price_filter=1000000_2000000&type=<?= htmlspecialchars($type_id) ?>" class="filter-price">Từ 1.000.000đ đến 2.000.000đ</a></li>
+                <li><a href="shop.php?price_filter=above_2000000&type=<?= htmlspecialchars($type_id) ?>" class="filter-price">Trên 2.000.000đ</a></li>
             </ul>
         </div>
         <div class="dsSanpham">
@@ -170,46 +190,46 @@ $result_type = $query_type->get_result();
             </div>
         </div>
     </div>
+
 </body>
 <?php include '../Thanhgiaodien/footer.php'; ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
 
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const productId = this.getAttribute('data-product-id');
-                const productName = this.getAttribute('data-product-name');
-                const price = this.getAttribute('data-price');
-                const img = this.getAttribute('data-img');
-                const saleoffId = this.getAttribute('data-saleoff-id');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+            const productName = this.getAttribute('data-product-name');
+            const price = this.getAttribute('data-price');
+            const img = this.getAttribute('data-img');
+            const saleoffId = this.getAttribute('data-saleoff-id');
 
-                const formData = new FormData();
-                formData.append('product_id', productId);
-                formData.append('product_name', productName);
-                formData.append('price', price);
-                formData.append('img', img);
-                formData.append('saleoff_id', saleoffId);
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            formData.append('product_name', productName);
+            formData.append('price', price);
+            formData.append('img', img);
+            formData.append('saleoff_id', saleoffId);
 
-                fetch('shop.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-                        } else {
-                            alert(data.message || 'Thêm sản phẩm thất bại!');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Đã xảy ra lỗi. Vui lòng thử lại!');
-                    });
-            });
+            fetch('shop.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                    } else {
+                        alert(data.message || 'Thêm sản phẩm thất bại!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi. Vui lòng thử lại!');
+                });
         });
     });
+});
 </script>
-
 </html>
