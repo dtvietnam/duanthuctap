@@ -11,20 +11,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
     $price = $_POST['price'];
     $img = $_POST['img'];
     $saleoff_id = $_POST['saleoff_id'];
+    $quantity = $_POST['quantity'] ?? 1;
 
     $sanpham = [
         'product_id' => $product_id,
         'product_name' => $product_name,
         'price' => $price,
         'img' => $img,
-        'saleoff_id' => $saleoff_id
+        'saleoff_id' => $saleoff_id,
+        'quantity' => $quantity
     ];
-
+    // Kiểm tra xem có tồn tại giỏ hàng chưa
     if (!isset($_SESSION['giohang'])) {
         $_SESSION['giohang'] = [];
     }
-
-    $_SESSION['giohang'][] = $sanpham;
+    // Kiểm tra sản phẩm đã tồn tại chưa
+    if (isset($_SESSION['giohang'][$product_id])) {
+        $_SESSION['giohang'][$product_id]['quantity'] += $quantity;
+    } else {
+        $_SESSION['giohang'][$product_id] = $sanpham;
+    }
 
     echo json_encode([
         'success' => true,
@@ -63,50 +69,51 @@ $quantity = isset($_POST['soluong']) ? (int) $_POST['soluong'] : 1;
 </head>
 <style>
     .quantity-wrapper {
-    display: flex;
-    margin: 1%;
-    align-items: center;
-    gap: 5px; /* Khoảng cách giữa các thành phần */
-}
+        display: flex;
+        margin: 1%;
+        align-items: center;
+        gap: 5px;
+        /* Khoảng cách giữa các thành phần */
+    }
 
-.quantity-input {
-    width: 50px; /* Độ rộng trường nhập số */
-    text-align: center;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 5px;
-    height: 20px;
-}
+    .quantity-input {
+        width: 50px;
+        /* Độ rộng trường nhập số */
+        text-align: center;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px;
+        height: 20px;
+    }
 
-.quantity-input:invalid {
-    border-color: red;
-}
+    .quantity-input:invalid {
+        border-color: red;
+    }
 
-.quantity-btn {
-    width: 20px;
-    height: 20px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    color: #333;
-    font-size: 14px;
-    text-align: center;
-    line-height: 18px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.2s;
-    padding: 0;
-}
+    .quantity-btn {
+        width: 20px;
+        height: 20px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        color: #333;
+        font-size: 14px;
+        text-align: center;
+        line-height: 18px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s;
+        padding: 0;
+    }
 
-.quantity-btn:hover {
-    background-color: #e0e0e0;
-    border-color: #aaa;
-}
+    .quantity-btn:hover {
+        background-color: #e0e0e0;
+        border-color: #aaa;
+    }
 
-.quantity-btn:active {
-    background-color: #ccc;
-}
-
+    .quantity-btn:active {
+        background-color: #ccc;
+    }
 </style>
 
 <body>
@@ -127,17 +134,18 @@ $quantity = isset($_POST['soluong']) ? (int) $_POST['soluong'] : 1;
             </div>
 
             <div class='quantity-wrapper'>
-                <button type='button' class='quantity-btn decrease' >-</button>
-                <input type="text" id="phone_number" class="no-spinners quantity-input" name='soluong[]' pattern="[0-9]*"
-                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" min="1" step="1"
+                <button type='button' class='quantity-btn decrease'>-</button>
+                <input type="text" id="phone_number" class="no-spinners quantity-input" name='soluong[]'
+                    pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" min="1" step="1"
                     value='<?= $quantity ?>'><br>
-                <button type='button' class='quantity-btn increase' >+</button>
+                <button type='button' class='quantity-btn increase'>+</button>
             </div>
             <button class="add-to-cart" data-product-id="<?= htmlspecialchars($product['product_id']) ?>"
                 data-product-name="<?= htmlspecialchars($product['product_name']) ?>"
                 data-price="<?= htmlspecialchars($product['price']) ?>"
                 data-img="<?= htmlspecialchars($product['img']) ?>"
-                data-saleoff-id="<?= htmlspecialchars($product['saleoff_id'] ?? '') ?>">
+                data-saleoff-id="<?= htmlspecialchars($product['saleoff_id'] ?? '') ?>"
+                data-quantity="<?= htmlspecialchars($quantity) ?>">
                 Đặt hàng
             </button>
         </div>
@@ -187,6 +195,8 @@ $quantity = isset($_POST['soluong']) ? (int) $_POST['soluong'] : 1;
                 const price = this.getAttribute('data-price');
                 const img = this.getAttribute('data-img');
                 const saleoffId = this.getAttribute('data-saleoff-id');
+                const quantityInput = this.closest('.product-details').querySelector('.quantity-input');
+                const quantity = quantityInput.value;
 
                 const formData = new FormData();
                 formData.append('product_id', productId);
@@ -194,6 +204,7 @@ $quantity = isset($_POST['soluong']) ? (int) $_POST['soluong'] : 1;
                 formData.append('price', price);
                 formData.append('img', img);
                 formData.append('saleoff_id', saleoffId);
+                formData.append('quantity', quantity);
 
                 fetch('shop.php', {
                     method: 'POST',
