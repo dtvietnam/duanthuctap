@@ -207,15 +207,17 @@ if (isset($_POST['submit'])) {
                         <td>
                             <div> <label for="customer_name">Họ Và Tên</label><br>
                                 <input type="text" id="customer_name" name="customer_name" required
-                                    placeholder="Họ và tên của bạn" value="<?= $name ?>"><br>
+                                    placeholder="Họ và tên của bạn" value="<?= htmlspecialchars($name) ?>"><br>
                             </div>
                         </td>
                         <td>
                             <div>
                                 <label for="phone_number">Số Điện Thoại</label><br>
-                                <input type="text" id="phone_number" name="phone_number" required
+                                <input type="text" id="phone_number" name="phone_number" placeholder="Số điện thoại nhận hàng"
+                                    <?= isset($sdt) ? 'readonly style="background-color: #e9ecef;"' : 'required' ?>
                                     placeholder="Số điện thoại nhận hàng" value="<?= $sdt ?>" pattern="[0-9]*"
                                     oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="11"><br>
+                                    
                             </div>
                         </td>
                         <td>
