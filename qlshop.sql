@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th12 26, 2024 lúc 03:56 AM
+-- Thời gian đã tạo: Th12 27, 2024 lúc 09:38 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -32,7 +32,7 @@ CREATE TABLE `customer` (
   `phone_number` varchar(11) NOT NULL,
   `customer_name` varchar(50) DEFAULT NULL,
   `address` varchar(50) DEFAULT NULL,
-  `point` int(11) NOT NULL,
+  `point` int(11) DEFAULT NULL,
   `role_id` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -41,7 +41,8 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`customer_id`, `phone_number`, `customer_name`, `address`, `point`, `role_id`) VALUES
-(22, '+841312314', 'anh Hải', '20', 367, 1);
+(22, '+841312314', 'anh Hải', '20', 367, 1),
+(24, '+8486926945', NULL, NULL, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -80,7 +81,12 @@ INSERT INTO `oder` (`oder_id`, `address`, `oder_date`, `description`, `status_id
 (52, '20', '2024-12-26 01:29:36', '', 1, 22, 1114),
 (53, 'Ninh Hoa,Khánh Hòa', '2024-12-26 01:30:52', '', 1, 22, 2046),
 (54, '20', '2024-12-26 01:43:19', 'khong nhan hang', 1, 22, 323),
-(55, '20', '2024-12-26 01:44:25', '', 1, 22, 3357);
+(55, '20', '2024-12-26 01:44:25', '', 1, 22, 3357),
+(56, '20', '2024-12-27 02:10:08', '', 1, 22, 4512),
+(57, '20', '2024-12-27 02:10:38', '', 1, 22, 0),
+(58, 'Ninh Hoa,Khánh Hòa', '2024-12-27 06:43:11', '', 1, 22, 2228),
+(59, 'Ninh Hoa,Khánh Hòa', '2024-12-27 07:34:50', '', 1, 22, 3342),
+(60, '20', '2024-12-27 08:35:11', '', 1, 22, 1114);
 
 -- --------------------------------------------------------
 
@@ -108,7 +114,12 @@ INSERT INTO `oder_detail` (`detail_id`, `product_id`, `oder_id`, `quantity_oder`
 (38, 24, 54, 1, 90),
 (39, 26, 54, 1, 233),
 (40, 24, 55, 14, 90),
-(41, 26, 55, 9, 233);
+(41, 26, 55, 9, 233),
+(42, 25, 56, 3, 1114),
+(43, 24, 56, 13, 90),
+(44, 25, 58, 2, 1114),
+(45, 25, 59, 3, 1114),
+(46, 25, 60, 1, 1114);
 
 -- --------------------------------------------------------
 
@@ -172,15 +183,21 @@ INSERT INTO `role` (`role_id`, `role_name`) VALUES
 
 CREATE TABLE `saleoff` (
   `saleoff_id` int(5) NOT NULL,
-  `sale_name` int(5) NOT NULL
+  `discount_rate` int(5) DEFAULT NULL,
+  `point` int(11) DEFAULT NULL,
+  `discount` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `saleoff`
 --
 
-INSERT INTO `saleoff` (`saleoff_id`, `sale_name`) VALUES
-(15, 20);
+INSERT INTO `saleoff` (`saleoff_id`, `discount_rate`, `point`, `discount`) VALUES
+(15, 20, NULL, 0),
+(16, NULL, 100, 50000),
+(17, NULL, 200, 100000),
+(18, NULL, 1000, 1000000),
+(19, NULL, 2000, 2000000);
 
 -- --------------------------------------------------------
 
@@ -312,7 +329,7 @@ ALTER TABLE `type`
 -- AUTO_INCREMENT cho bảng `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT cho bảng `note`
@@ -324,13 +341,13 @@ ALTER TABLE `note`
 -- AUTO_INCREMENT cho bảng `oder`
 --
 ALTER TABLE `oder`
-  MODIFY `oder_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `oder_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT cho bảng `oder_detail`
 --
 ALTER TABLE `oder_detail`
-  MODIFY `detail_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `detail_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT cho bảng `product`
@@ -348,7 +365,7 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT cho bảng `saleoff`
 --
 ALTER TABLE `saleoff`
-  MODIFY `saleoff_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `saleoff_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT cho bảng `slide`
