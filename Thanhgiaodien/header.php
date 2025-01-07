@@ -87,7 +87,7 @@ if (isset($_SESSION['customer_id'])) {
                     <?php endif; ?>
 
                     <div class="cart">
-                        <a href="../Trang/shopping.php"><i class="fas fa-shopping-cart"></i></a>
+                        <a href="../Trang/add_to_cart.php""><i class="fas fa-shopping-cart"></i></a>
                         <?php if ($total_items_in_cart > 0): ?>
                             <div class="cart-number">
                                 <p><?php echo $total_items_in_cart; ?></p>

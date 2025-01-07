@@ -40,22 +40,17 @@ if (isset($_SESSION['phone_number'])) {
 }
 
 $customer_id = null;
+if(isset($_POST['show_modal'])){
+    $description = trim($_POST['description']);
+    $_SESSION['giohang'][$product_id]['description'] = $description;
+}
 if (isset($_POST['checkout_button'])) {
     // Lấy thông tin từ form
     $customer_name = trim($_POST['customer_name']);
     $address = trim($_POST['address']);
-    $description = trim($_POST['description']);
-    $sales = trim($_POST['Sale']) ?? null;
-    $giohang = json_decode($_POST['giohang'], true);
-    // Tính lại tổng giá trị trên server để đảm bảo tính chính xác
-    $total_price = 0;
-    foreach ($giohang as $item) {
-        $total_price += $item['price'] * $item['quantity'];
-    }
-
+    
     if (isset($_SESSION['phone_number'])) {
         $phone_number = $_SESSION['phone_number']; // Using logged-in customer
-
         $kt_customer = $conn->prepare("SELECT `customer_id` FROM `customer` WHERE phone_number= ?");
         $kt_customer->bind_param("s", $phone_number);
         $kt_customer->execute();
@@ -63,11 +58,18 @@ if (isset($_POST['checkout_button'])) {
         if ($kt_result->num_rows > 0) {
             $customer = $kt_result->fetch_assoc();
             $customer_id = $customer['customer_id'];
+            if($customer_name != null && $address != null ){
+            $sql_customer = "UPDATE customer SET customer_name = ?, address = ? WHERE customer_id = ?";
+            $stmt_customer = $conn->prepare($sql_customer);
+            $stmt_customer->bind_param("ssi",  $customer_name, $address, $customer_id);
+            $stmt_customer->execute();
+            }
         }
+
     } else {
         $phone_number = $_POST['phone_number'];
         // Chuẩn hóa số điện thoại cho Firebase (chuyển 0 đầu thành +84)
-        $normalizedPhoneForFirebase = preg_replace('/^0/', '+84', $phone_number);
+        $normalizedPhoneForFirebase = preg_replace('/^0/', '+84', $phone_number); 
         $normalizedPhoneForDatabase = $phone_number;
 
         $kt_customer = $conn->prepare("SELECT `customer_id` FROM `customer` WHERE phone_number= ?");
@@ -77,6 +79,12 @@ if (isset($_POST['checkout_button'])) {
         if ($kt_result->num_rows > 0) {
             $customer = $kt_result->fetch_assoc();
             $customer_id = $customer['customer_id'];
+            if($customer_name != null && $address != null ){
+                $sql_customer = "UPDATE customer SET customer_name = ?, address = ? WHERE customer_id = ?";
+                $stmt_customer = $conn->prepare($sql_customer);
+                $stmt_customer->bind_param("ssi",  $customer_name, $address, $customer_id);
+                $stmt_customer->execute();
+                }
         } else {
             // Nếu không tồn tại, thêm mới khách hàng
             $sql_customer = "INSERT INTO customer (phone_number, customer_name, address, role_id) VALUES (?, ?, ?, 1)";
@@ -86,32 +94,11 @@ if (isset($_POST['checkout_button'])) {
             $customer_id = $conn->insert_id;
         }
         $_SESSION['phone_number'] = $phone_number;
-    }
-    echo $customer_id;
-    $sql_order = "INSERT INTO `oder` (address, description, customer_id, total_price, status_id) 
-        VALUES (?, ?, ?, ?, 1)";
-    $stmt = $conn->prepare($sql_order);
-    $stmt->bind_param("ssii", $address, $description, $customer_id, $total_price);
-    $stmt->execute();
-    $orderId = $conn->insert_id;
-
-    foreach ($giohang as $item) {
-        $price = $item['price'];
-        $quantity = $item['quantity'];
-        saveOrderDetail($conn, $orderId, $item['product_id'], $quantity, $price);
-    }
-    // Cộng điểm thưởng
-    $point = floor($total_price / 10000);
-    $update_points_sql = "UPDATE customer SET point = point + ? WHERE customer_id = ?";
-    $update_points_stmt = $conn->prepare($update_points_sql);
-    $update_points_stmt->bind_param("ii", $point, $customer_id);
-    $update_points_stmt->execute();
-
-    // Xóa giỏ hàng sau khi hoàn tất
-    unset($_SESSION['giohang']);
+    }    
+   
 
     // Chuyển hướng đến trang quản lý đơn hàng
-    header("Location: ../Quanly/donhang.php");
+    header("Location: ../Quanly/check_out_pay.php");
     exit();
 }
 ?>
@@ -170,7 +157,7 @@ if (isset($_POST['checkout_button'])) {
                             $quantity = $item['quantity'];
                             $thanhtien = $item['price'] * $quantity; // Tính thành tiền
                             $total_price += $thanhtien; // Cộng dồn vào tổng giá trị
-                    ?>
+                            ?>
                             <tr>
                                 <td><img src="../anh/<?= htmlspecialchars($item['img']) ?>" class="product-image"
                                         alt="Hình sản phẩm">
@@ -211,7 +198,7 @@ if (isset($_POST['checkout_button'])) {
                                         if ($result):
                                             while ($row = mysqli_fetch_array($result)): ?>
                                                 <option value="<?= $row['saleoff_id'] ?>"><?= $row['discount'] ?></option>
-                                    <?php endwhile;
+                                            <?php endwhile;
                                         endif;
                                     endif; ?>
                                 </select>
@@ -268,7 +255,7 @@ if (isset($_POST['checkout_button'])) {
             <div class="modal-content">
                 <button class="close" id="close-modal">&times;</button>
                 <h3>Thông tin giao hàng</h3>
-                <form method="POST">
+                <form method="POST" >
                     <label>Thông tin người đặt:</label>
                     <label>
                         <input type="radio" name="gender" value="Anh"> Anh
@@ -281,141 +268,141 @@ if (isset($_POST['checkout_button'])) {
 
                     <label for="phone_number">Số Điện Thoại</label>
                     <input type="text" id="phone_number" name="phone_number" placeholder="Số điện thoại nhận hàng"
-                        <?php if (isset($sdt)): ?> readonly style="background-color: #e9ecef;" <?php else: ?> required
-                        <?php endif; ?> value="<?= htmlspecialchars($sdt); ?>" pattern="[0-9]*"
+                        <?php if (isset($sdt)): ?> readonly style="background-color: #e9ecef;" <?php else: ?> required <?php endif; ?>
+                        value="<?= htmlspecialchars($sdt); ?>" pattern="[0-9]*"
                         oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="11">
 
                     <label for="address">Địa Chỉ Nhận Hàng</label>
                     <input type="text" id="address" name="address" required placeholder="Nhập địa chỉ nhận hàng"
                         value="<?= $add ?>">
 
-                    <button type="submit" name="checkout_button" class="checkout_button">Xác nhận mua</button>
+                        <button type="submit" name="checkout_button" class="checkout_button">Xác nhận mua</button>
                 </form>
             </div>
         </div>
     </body>
-
-
+    
+    
 <?php endif; ?>
 
 <?php require '../Thanhgiaodien/footer.php'; ?>
 <script>
-    // Cập nhật giá trị trong input khi người dùng nhấn "+" hoặc "-"
-    document.querySelectorAll('.quantity-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const input = this.closest('.quantity-wrapper').querySelector('.quantity-input');
-            let currentValue = parseInt(input.value);
+        // Cập nhật giá trị trong input khi người dùng nhấn "+" hoặc "-"
+        document.querySelectorAll('.quantity-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const input = this.closest('.quantity-wrapper').querySelector('.quantity-input');
+                let currentValue = parseInt(input.value);
 
-            if (this.classList.contains('increase')) {
-                currentValue += 1; // Tăng số lượng
-            } else if (this.classList.contains('decrease') && currentValue > 1) {
-                currentValue -= 1; // Giảm số lượng, không thấp hơn 1
-            }
+                if (this.classList.contains('increase')) {
+                    currentValue += 1; // Tăng số lượng
+                } else if (this.classList.contains('decrease') && currentValue > 1) {
+                    currentValue -= 1; // Giảm số lượng, không thấp hơn 1
+                }
 
-            input.value = currentValue;
+                input.value = currentValue;
 
-            // Cập nhật lại giá trị thành tiền của sản phẩm
-            updateItemTotalPrice(this.closest('tr'));
+                // Cập nhật lại giá trị thành tiền của sản phẩm
+                updateItemTotalPrice(this.closest('tr'));
 
-            // Cập nhật lại số lượng trên session
-            updateItemQuantity(this.closest('tr'));
+                // Cập nhật lại số lượng trên session
+                updateItemQuantity(this.closest('tr'));
 
 
-            // Cập nhật lại tổng giá trị của giỏ hàng
-            updateTotalPrice();
+                // Cập nhật lại tổng giá trị của giỏ hàng
+                updateTotalPrice();
+            });
         });
-    });
-    // Cập nhật giá trị trong input khi người dùng nhập trực tiếp vào ô input
-    document.querySelectorAll('.quantity-input').forEach(input => {
-        input.addEventListener('input', function() {
-            let currentValue = parseInt(this.value);
+        // Cập nhật giá trị trong input khi người dùng nhập trực tiếp vào ô input
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('input', function () {
+                let currentValue = parseInt(this.value);
 
-            // Kiểm tra nếu giá trị không phải là số hoặc nhỏ hơn 1
-            if (isNaN(currentValue) || currentValue < 1) {
-                alert("Vui lòng nhập một số hợp lệ (lớn hơn hoặc bằng 1).");
-                this.value = 1; // Thiết lập lại giá trị mặc định
-                currentValue = 1;
-            }
+                // Kiểm tra nếu giá trị không phải là số hoặc nhỏ hơn 1
+                if (isNaN(currentValue) || currentValue < 1) {
+                    alert("Vui lòng nhập một số hợp lệ (lớn hơn hoặc bằng 1).");
+                    this.value = 1; // Thiết lập lại giá trị mặc định
+                    currentValue = 1;
+                }
 
-            // Cập nhật lại giá trị thành tiền của sản phẩm
-            updateItemTotalPrice(this.closest('tr'));
+                // Cập nhật lại giá trị thành tiền của sản phẩm
+                updateItemTotalPrice(this.closest('tr'));
 
-            // Cập nhật lại số lượng trên session
-            updateItemQuantity(this.closest('tr'));
+                // Cập nhật lại số lượng trên session
+                updateItemQuantity(this.closest('tr'));
 
-            // Cập nhật lại tổng giá trị của giỏ hàng
-            updateTotalPrice();
+                // Cập nhật lại tổng giá trị của giỏ hàng
+                updateTotalPrice();
+            });
         });
-    });
 
-    function updateItemQuantity(row) {
-        const productId = row.querySelector('.quantity-input').getAttribute('data-product-id');
-        const quantity = parseInt(row.querySelector('.quantity-input').value);
+        function updateItemQuantity(row) {
+            const productId = row.querySelector('.quantity-input').getAttribute('data-product-id');
+            const quantity = parseInt(row.querySelector('.quantity-input').value);
 
-        const formData = new FormData();
-        formData.append('product_id', productId);
-        formData.append('quantity', quantity);
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            formData.append('quantity', quantity);
 
-        fetch('add_to_cart.php', {
+            fetch('add_to_cart.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log(data.message);
-                } else {
-                    console.error(data.message || 'Cập nhật thất bại!');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Đã xảy ra lỗi. Vui lòng thử lại!');
-            });
-    }
-
-    function updateItemTotalPrice(row) {
-        const quantity = parseInt(row.querySelector('.quantity-input').value);
-        const price = parseFloat(row.querySelector('.product-price').textContent.replace(' VNĐ', '').replace(',', ''));
-        const itemTotal = quantity * price;
-
-        row.querySelector('.item-total-price').textContent = itemTotal.toFixed(0) + ' VNĐ';
-    }
-
-    function updateTotalPrice() {
-        let total = 0;
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            const row = input.closest('tr');
-            const price = parseFloat(row.querySelector('.product-price').textContent.replace(' VNĐ', '').replace(
-                ',', ''));
-            const quantity = parseInt(input.value);
-            total += price * quantity;
-        });
-        document.getElementById('total-price').textContent = total.toFixed(0) + ' VNĐ';
-    }
-    document.addEventListener("DOMContentLoaded", function() {
-        const modal = document.getElementById("modal");
-        const showModalButton = document.getElementById("show-modal");
-        const closeModalButton = document.getElementById("close-modal");
-
-        if (showModalButton) {
-            showModalButton.addEventListener("click", function() {
-                if (modal) modal.style.display = "flex";
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log(data.message);
+                    } else {
+                        console.error(data.message || 'Cập nhật thất bại!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi. Vui lòng thử lại!');
+                });
         }
 
-        if (closeModalButton) {
-            closeModalButton.addEventListener("click", function() {
-                if (modal) modal.style.display = "none";
-            });
+        function updateItemTotalPrice(row) {
+            const quantity = parseInt(row.querySelector('.quantity-input').value);
+            const price = parseFloat(row.querySelector('.product-price').textContent.replace(' VNĐ', '').replace(',', ''));
+            const itemTotal = quantity * price;
+
+            row.querySelector('.item-total-price').textContent = itemTotal.toFixed(0) + ' VNĐ';
         }
 
-        window.addEventListener("click", function(event) {
-            if (modal && event.target === modal) {
-                modal.style.display = "none";
+        function updateTotalPrice() {
+            let total = 0;
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                const row = input.closest('tr');
+                const price = parseFloat(row.querySelector('.product-price').textContent.replace(' VNĐ', '').replace(',', ''));
+                const quantity = parseInt(input.value);
+                total += price * quantity;
+            });
+            document.getElementById('total-price').textContent = total.toFixed(0) + ' VNĐ';
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("modal");
+            const showModalButton = document.getElementById("show-modal");
+            const closeModalButton = document.getElementById("close-modal");
+
+            if (showModalButton) {
+                showModalButton.addEventListener("click", function () {
+                    if (modal) modal.style.display = "flex";
+                });
             }
-        });
-    });
-</script>
 
+            if (closeModalButton) {
+                closeModalButton.addEventListener("click", function () {
+                    if (modal) modal.style.display = "none";
+                });
+            }
+
+            window.addEventListener("click", function (event) {
+                if (modal && event.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+
+
+        </script>
 </html>
