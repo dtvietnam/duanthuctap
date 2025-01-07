@@ -1,13 +1,17 @@
 <?php
 session_start();
+$title = "Đăng nhập";
 require_once '../database/connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     // Lấy số điện thoại từ form
     $phone = $_POST['phone'];
-    
+
     // Chuẩn hóa số điện thoại cho Firebase (chuyển 0 đầu thành +84)
-    $normalizedPhoneForFirebase = preg_replace('/^0/', '+84', $phone); 
+    $normalizedPhoneForFirebase = preg_replace('/^0/', '+84', $phone);
+
+    // Lưu số điện thoại gốc vào cơ sở dữ liệu
+    $normalizedPhoneForDatabase = $phone;
 
     // Kiểm tra số điện thoại trong cơ sở dữ liệu
     $stmt = $conn->prepare("SELECT * FROM customer WHERE phone_number = ?");

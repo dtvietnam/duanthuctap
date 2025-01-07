@@ -24,6 +24,7 @@ if (isset($_POST['submit'])) {
     $price = $_POST['price'];
     $type_id = $_POST['type_id'];
     $saleoff_id = $_POST['saleoff_id'];
+    $quantity = $_POST['quantity'];
     $img = $_FILES['img']['name'];
     $img_tmp = $_FILES['img']['tmp_name'];
     if (!is_numeric($price) || $price < 0) {
@@ -41,8 +42,8 @@ if (isset($_POST['submit'])) {
     }
 
     // Cập nhật sản phẩm vào CSDL
-    $stmt = $conn->prepare("UPDATE product SET product_name = ?, price = ?, img = ?, type_id = ?, saleoff_id = ? WHERE product_id = ?");
-    $stmt->bind_param("sdsiii", $product_name, $price, $img, $type_id, $saleoff_id, $product_id);
+    $stmt = $conn->prepare("UPDATE product SET product_name = ?, price = ?, quantity = ?, img = ?, type_id = ?, saleoff_id = ? WHERE product_id = ?");
+    $stmt->bind_param("sddsiii", $product_name, $price, $quantity, $img, $type_id, $saleoff_id, $product_id);
 
     if ($stmt->execute()) {
         header("Location: sanpham.php");
@@ -168,6 +169,11 @@ if (isset($_POST['submit'])) {
                         <label for="price" class="form-label">Giá sản phẩm</label>
                         <input type="number" name="price" id="price" class="form-control"
                             value="<?= $product['price'] ?>" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Số lượng kho</label>
+                        <input type="number" name="quantity" id="quantity" class="form-control"
+                            value="<?= $product['quantity'] ?>" required />
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Ảnh sản phẩm (giữ nguyên nếu không chọn mới)</label>

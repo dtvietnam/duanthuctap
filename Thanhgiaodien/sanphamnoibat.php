@@ -14,9 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
     $price = $_POST['price'];
     $img = $_POST['img'];
     $saleoff_id = $_POST['saleoff_id'];
-    $quantity = $_POST['quantity']?? 1;
-    foreach($_SESSION['giohang'] as $index=>$item){
-        
+    $quantity = $_POST['quantity'] ?? 1;
+    foreach ($_SESSION['giohang'] as $index => $item) {
     }
     $sanpham = [
         'product_id' => $product_id,
@@ -26,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
         'saleoff_id' => $saleoff_id,
         'quantity' => $quantity
     ];
-    
+
     // Kiểm tra sản phẩm đã tồn tại chưa
     if (isset($_SESSION['giohang'][$product_id])) {
         $_SESSION['giohang'][$product_id]['quantity'] += $quantity;
@@ -47,7 +46,7 @@ $result_total = mysqli_query($conn, $total);
 $total_product = mysqli_fetch_assoc($result_total)['total'];
 $begin_product = max(0, $total_product - 9);
 
-$product = "SELECT * FROM product ORDER BY create_at DESC LIMIT ?, 9";
+$product = "SELECT * FROM product ORDER BY create_at DESC LIMIT ?, 8";
 $query_type = $conn->prepare($product);
 $query_type->bind_param("i", $begin_product);
 $query_type->execute();
@@ -65,6 +64,7 @@ $result_type = $query_type->get_result();
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: white;
         }
 
         .sanphamnoibat {
@@ -74,27 +74,30 @@ $result_type = $query_type->get_result();
 
         .sanphamnoibat h2 {
             font-weight: bold;
-            font-size: 24px;
+            color: rgb(26, 89, 23);
+            font-size: 40px;
             margin-bottom: 30px;
         }
 
         .product-container {
             display: flex;
+            justify-content: center;
+            /* Center the product container */
             flex-wrap: wrap;
             gap: 20px;
-            justify-content: center;
-            align-items: center;
         }
 
         .dsSanpham {
-            width: 70%;
+            width: 100%;
+            max-width: 1200px;
+            /* Limit the width for larger screens */
             padding: 20px;
         }
 
         .item {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
         }
 
         .image img {
@@ -102,42 +105,81 @@ $result_type = $query_type->get_result();
             height: 250px;
             object-fit: cover;
             border-radius: 10px;
+            padding: 30px;
         }
 
         .text {
             text-align: center;
+            /* Căn giữa văn bản */
+            margin: 10px 0;
+            /* Thêm khoảng cách */
+            padding-left: 20px;
+            /* Dịch sang bên phải 20px */
+
         }
 
         .name {
-            font-size: 18px;
+            color: rgb(26, 89, 23);
+            font-size: 25px;
             font-weight: bold;
             margin: 10px 0;
         }
 
-        .button {
-            background-color: #0800ff;
+        .price {
+            font-size: 20px;
+            /* Điều chỉnh kích thước chữ cho giá */
+            margin: 10px 0;
+            /* Thêm khoảng cách */
+        }
+
+        .add-to-cart {
+            font-size: 20px;
+            display: block;
+            /* Biến nút thành phần tử block */
+            margin: 0 auto;
+            /* Căn giữa nút nếu cần */
+            background-color: rgb(24, 68, 21);
             color: white;
-            padding: 10px;
+            padding: 15px;
             border: none;
+            font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 15px;
             transition: background-color 0.3s;
         }
 
-        .button:hover {
-            background-color: #0066cc;
+        .add-to-cart:hover {
+            background-color: rgb(202, 55, 48);
+            transform: scale(1.1);
         }
 
         @media (max-width: 1200px) {
+            .item {
+                grid-template-columns: repeat(3, 1fr);
+                /* 3 columns for medium screens */
+            }
+
             .dsSanpham {
-                width: 48%;
+                width: 90%;
             }
         }
 
         @media (max-width: 768px) {
+            .item {
+                grid-template-columns: repeat(2, 1fr);
+                /* 2 columns for small screens */
+            }
+
             .dsSanpham {
                 width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .item {
+                grid-template-columns: 1fr;
+                /* 1 column for very small screens */
             }
         }
     </style>
@@ -179,11 +221,11 @@ $result_type = $query_type->get_result();
     </div>
 </body>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const addToCartButtons = document.querySelectorAll('.add-to-cart');
 
         addToCartButtons.forEach(button => {
-            button.addEventListener('click', function () {
+            button.addEventListener('click', function() {
                 const productId = this.getAttribute('data-product-id');
                 const productName = this.getAttribute('data-product-name');
                 const price = this.getAttribute('data-price');
@@ -202,9 +244,9 @@ $result_type = $query_type->get_result();
 
 
                 fetch('shop.php', {
-                    method: 'POST',
-                    body: formData
-                })
+                        method: 'POST',
+                        body: formData
+                    })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -221,4 +263,5 @@ $result_type = $query_type->get_result();
         });
     });
 </script>
+
 </html>

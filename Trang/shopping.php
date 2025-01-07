@@ -30,17 +30,16 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete') {
     }
 }
 if (isset($_SESSION['phone_number'])) {
-    $phone_number = $_SESSION['phone_number'];
-    $sql = "SELECT * FROM `customer` WHERE  phone_number =  '$phone_number'";
+    $id = $_SESSION['phone_number'];
+    $sql = "SELECT `phone_number`, `customer_name`, `address`FROM `customer` WHERE phone_number =  $id";
     $result = mysqli_query($conn, $sql);
     while ($row = mysqli_fetch_assoc($result)) {
-        $sdt = $phone_number;
-        $name = isset($row['customer_name'])? $row['customer_name']: null;
-        $add = isset($row['address']) ? $row['address']: null;
-        $poin = isset($row['point'])? $row['point']: null;
+        $sdt = $row['phone_number'];
+        $name = $row['customer_name'];
+        $add = $row['address'];
     }
 } else {
-    $name = $sdt = $add = null;
+    $name = $sdt = $add = '';
 }
 function saveOrderDetail($conn, $orderId, $productId, $quantity, $price)
 {
@@ -57,27 +56,15 @@ if (isset($_POST['submit'])) {
     $customer_name = trim($_POST['customer_name']);
     $address = trim($_POST['address']);
     $description = trim($_POST['dedescription']);
-    $sales= trim($_POST['Sale'])?? null;
     $giohang = json_decode($_POST['giohang'], true);
     // Tính lại tổng giá trị trên server để đảm bảo tính chính xác
     $total_price = 0;
     foreach ($giohang as $item) {
         $total_price += $item['price'] * $item['quantity'];
     }
-    if ($sales) {
-        $query_sale = "SELECT `discount` FROM `saleoff` WHERE `saleoff_id` = ?";
-        $stmt_sale = $conn->prepare($query_sale);
-        $stmt_sale->bind_param("i", $sales);
-        $stmt_sale->execute();
-        $result_sale = $stmt_sale->get_result();
-        if ($result_sale->num_rows > 0) {
-            $row_sale = $result_sale->fetch_assoc();
-            $discount = $row_sale['discount'];
-            $total_price -= $discount;
-        }
-    }
     if (isset($_SESSION['phone_number'])) {
         $phone_number = $_SESSION['phone_number']; // Using logged-in customer
+        $phone_number = preg_replace('/^0/', '+84', $phone_number);
 
         $kt_customer = $conn->prepare("SELECT `customer_id` FROM `customer` WHERE phone_number= ?");
         $kt_customer->bind_param("s", $phone_number);
@@ -127,7 +114,7 @@ if (isset($_POST['submit'])) {
     $update_points_stmt = $conn->prepare($update_points_sql);
     $update_points_stmt->bind_param("ii", $point, $customer_id);
     $update_points_stmt->execute();
-    
+
     // Xóa giỏ hàng sau khi hoàn tất
     unset($_SESSION['giohang']);
 
@@ -171,7 +158,7 @@ if (isset($_POST['submit'])) {
                         $quantity = $item['quantity'];
                         $thanhtien = $item['price'] * $quantity; // Tính thành tiền
                         $total_price += $thanhtien; // Cộng dồn vào tổng giá trị
-                        ?>
+                ?>
                         <tr>
                             <td><img src="../anh/<?= htmlspecialchars($item['img']) ?>" class="product-image"
                                     alt="Hình sản phẩm">
@@ -197,40 +184,11 @@ if (isset($_POST['submit'])) {
                                 </a>
                             </td>
                         </tr>
-                        
                     <?php endforeach; ?>
                     <tr>
-                            <td colspan="4"></td>
-                            <td colspan="2">
-                                <label class="form-label font-weight-bold" for="Sale">Sale</label>
-                                <select name="Sale" id="Sale" class="form-control form-control-lg" onchange="applyVoucher()">
-                                    <option value="">Voucher</option>
-                                    <?php
-                                    if(isset($poin)):
-                                        $query = "SELECT `saleoff_id`, `point`, `discount` FROM `saleoff` WHERE `point` <= $poin AND `point` IS NOT NULL"; 
-                                        $result = mysqli_query($conn, $query);
-                                        if ($result) :
-                                            while ($row = mysqli_fetch_array($result)) : ?>
-                                                <option value="<?= $row['saleoff_id'] ?>"><?= $row['discount'] ?></option>
-                                        <?php endwhile;
-                                        endif; 
-                                    endif;?>
-                                </select>
-                            </td>
-                        </tr>
-                    <tr>
                         <td colspan="4" style="text-align: right; font-weight: bold;">Tổng giá trị:</td>
-                        <td colspan="2">
-                            <span class="sale-price" style="color: red;" id="total-price" data-original-price="<?= $total_price ?>">
-                                <?= number_format($total_price) ?> VNĐ
-                            </span>
-                            <?php if (isset($_POST['Sale'])): ?>
-                                <span class="h6 original-price">
-                                    <del style="color: gray;">
-                                        <?= number_format($total_price) ?> VNĐ
-                                    </del>
-                                </span>
-                            <?php endif; ?>
+                        <td colspan="2"><span id="total-price"
+                                name="total_price"><?= isset($total_price) ? $total_price : 0 ?></span>VND
                         </td>
                     </tr>
                 <?php else: ?>
@@ -255,11 +213,12 @@ if (isset($_POST['submit'])) {
                         <td>
                             <div>
                                 <label for="phone_number">Số Điện Thoại</label><br>
-                                <input type="text" id="phone_number" name="phone_number" placeholder="Số điện thoại nhận hàng"
-                                    <?php if(isset($sdt)): ?> readonly style="background-color: #e9ecef;" <?php else: ?> required <?php endif; ?>
+                                <input type="text" id="phone_number" name="phone_number"
+                                    placeholder="Số điện thoại nhận hàng"
+                                    <?= isset($sdt) ? 'readonly style="background-color: #e9ecef;"' : 'required' ?>
                                     placeholder="Số điện thoại nhận hàng" value="<?= $sdt ?>" pattern="[0-9]*"
                                     oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="11"><br>
-                                    
+
                             </div>
                         </td>
                         <td>
@@ -300,7 +259,7 @@ if (isset($_POST['submit'])) {
 <script>
     // Cập nhật giá trị trong input khi người dùng nhấn "+" hoặc "-"
     document.querySelectorAll('.quantity-btn').forEach(button => {
-        button.addEventListener('click', function () {
+        button.addEventListener('click', function() {
             const input = this.closest('.quantity-wrapper').querySelector('.quantity-input');
             let currentValue = parseInt(input.value);
 
@@ -325,7 +284,7 @@ if (isset($_POST['submit'])) {
     });
     // Cập nhật giá trị trong input khi người dùng nhập trực tiếp vào ô input
     document.querySelectorAll('.quantity-input').forEach(input => {
-        input.addEventListener('input', function () {
+        input.addEventListener('input', function() {
             let currentValue = parseInt(this.value);
 
             // Kiểm tra nếu giá trị không phải là số hoặc nhỏ hơn 1
@@ -355,9 +314,9 @@ if (isset($_POST['submit'])) {
         formData.append('quantity', quantity);
 
         fetch('shopping.php', {
-            method: 'POST',
-            body: formData
-        })
+                method: 'POST',
+                body: formData
+            })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -384,13 +343,13 @@ if (isset($_POST['submit'])) {
         let total = 0;
         document.querySelectorAll('.quantity-input').forEach(input => {
             const row = input.closest('tr');
-            const price = parseFloat(row.querySelector('.product-price').textContent.replace(' VNĐ', '').replace(',', ''));
+            const price = parseFloat(row.querySelector('.product-price').textContent.replace(' VNĐ', '').replace(
+                ',', ''));
             const quantity = parseInt(input.value);
             total += price * quantity;
         });
         document.getElementById('total-price').textContent = total.toFixed(0) + ' VNĐ';
     }
-
 </script>
 
 </html>

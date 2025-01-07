@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th12 27, 2024 lúc 09:38 AM
+-- Thời gian đã tạo: Th1 04, 2025 lúc 08:19 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -29,10 +29,10 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `customer` (
   `customer_id` int(11) NOT NULL,
-  `phone_number` varchar(11) NOT NULL,
+  `phone_number` varchar(13) NOT NULL,
   `customer_name` varchar(50) DEFAULT NULL,
   `address` varchar(50) DEFAULT NULL,
-  `point` int(11) DEFAULT NULL,
+  `point` int(11) NOT NULL,
   `role_id` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -41,8 +41,19 @@ CREATE TABLE `customer` (
 --
 
 INSERT INTO `customer` (`customer_id`, `phone_number`, `customer_name`, `address`, `point`, `role_id`) VALUES
-(22, '+841312314', 'anh Hải', '20', 367, 1),
-(24, '+8486926945', NULL, NULL, 0, 1);
+(2, '1312314', 'anh Hải', 'Ninh Hoa,Khánh Hòa', 1, 1),
+(3, '841312314', 'anh Hải', 'Ninh Hoa,Khánh Hòa', 0, 1),
+(4, '13132314', 'anh Hải', '20', 0, 1),
+(14, '0962071416', NULL, NULL, 0, 1),
+(15, '+841312314', 'anh Hải', '20', 0, 1),
+(17, '+8486926945', 'anh Hải', 'califonia', 0, 1),
+(18, '+8432569865', 'anh Hải', 'Ninh Hoa,Khánh Hòa', 0, 1),
+(19, '+8432569854', 'anh Hải', 'Ninh Hoa,Khánh Hòa', 0, 1),
+(20, '+8432569854', 'anh Hải', 'Ninh Hoa,Khánh Hòa', 0, 1),
+(21, '+8432569854', 'anh Hải', 'Ninh Hoa,Khánh Hòa', 0, 1),
+(22, '0123456789', 'Test User', '123 Test Street', 0, 1),
+(24, '0773915146', NULL, NULL, 0, 2),
+(25, '+8477391514', NULL, NULL, 0, 2);
 
 -- --------------------------------------------------------
 
@@ -56,6 +67,14 @@ CREATE TABLE `note` (
   `description` varchar(500) NOT NULL,
   `note_img` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `note`
+--
+
+INSERT INTO `note` (`note_id`, `note_name`, `description`, `note_img`) VALUES
+(9, 'aa', 'zxcxzvfdsfdsasd', 'about.jpg'),
+(10, 'Khánh thành nhà máy kết hợp du lịch sinh thái ở Kh', 'Tối 28.12, tại KCN Đắc Lộc, xã Vĩnh Phương, TP. Nha Trang (Khánh Hòa), Công ty cổ phần Yến sào DTNEST Khánh Hòa (thuộc D&T Group) tổ chức lễ khánh thành nhà máy sản xuất yến sào, rong biển D&T.', 'contact.jpg');
 
 -- --------------------------------------------------------
 
@@ -78,15 +97,14 @@ CREATE TABLE `oder` (
 --
 
 INSERT INTO `oder` (`oder_id`, `address`, `oder_date`, `description`, `status_id`, `customer_id`, `total_price`) VALUES
-(52, '20', '2024-12-26 01:29:36', '', 1, 22, 1114),
-(53, 'Ninh Hoa,Khánh Hòa', '2024-12-26 01:30:52', '', 1, 22, 2046),
-(54, '20', '2024-12-26 01:43:19', 'khong nhan hang', 1, 22, 323),
-(55, '20', '2024-12-26 01:44:25', '', 1, 22, 3357),
-(56, '20', '2024-12-27 02:10:08', '', 1, 22, 4512),
-(57, '20', '2024-12-27 02:10:38', '', 1, 22, 0),
-(58, 'Ninh Hoa,Khánh Hòa', '2024-12-27 06:43:11', '', 1, 22, 2228),
-(59, 'Ninh Hoa,Khánh Hòa', '2024-12-27 07:34:50', '', 1, 22, 3342),
-(60, '20', '2024-12-27 08:35:11', '', 1, 22, 1114);
+(38, 'Ninh Hoa,Khánh Hòa', '2024-12-19 09:06:42', '', 2, 2, 0),
+(39, 'Ninh Hoa,Khánh Hòa', '2024-12-19 09:12:55', '', 2, 3, 0),
+(40, '20', '2024-12-19 09:14:27', '', 4, 4, 0),
+(46, '20', '2024-12-19 09:27:31', '', 2, 2, 0),
+(47, 'Ninh Hoa,Khánh Hòa', '2024-12-24 07:13:00', '', 1, 18, 0),
+(48, 'Ninh Hoa,Khánh Hòa', '2024-12-24 07:32:52', '', 1, 20, 1580),
+(49, 'Ninh Hoa,Khánh Hòa', '2024-12-24 09:05:31', '', 4, 21, 58037),
+(52, 'nhà riêng', '2025-01-03 01:40:53', '', 1, 25, 100);
 
 -- --------------------------------------------------------
 
@@ -107,19 +125,25 @@ CREATE TABLE `oder_detail` (
 --
 
 INSERT INTO `oder_detail` (`detail_id`, `product_id`, `oder_id`, `quantity_oder`, `price_oder`) VALUES
-(34, 25, 52, 1, 1114),
-(35, 25, 53, 1, 1114),
-(36, 29, 53, 1, 233),
-(37, 33, 53, 3, 233),
-(38, 24, 54, 1, 90),
-(39, 26, 54, 1, 233),
-(40, 24, 55, 14, 90),
-(41, 26, 55, 9, 233),
-(42, 25, 56, 3, 1114),
-(43, 24, 56, 13, 90),
-(44, 25, 58, 2, 1114),
-(45, 25, 59, 3, 1114),
-(46, 25, 60, 1, 1114);
+(17, 25, 38, 1, 1114),
+(18, 24, 38, 1, 90),
+(19, 24, 39, 1, 90),
+(20, 26, 39, 1, 233),
+(21, 25, 40, 1, 1114),
+(22, 33, 40, 1, 233),
+(23, 24, 46, 1, 90),
+(24, 33, 46, 1, 233),
+(25, 24, 47, 8, 90),
+(26, 26, 47, 1, 233),
+(27, 25, 47, 2, 1114),
+(28, 25, 48, 1, 1114),
+(29, 29, 48, 1, 233),
+(30, 32, 48, 1, 233),
+(31, 24, 49, 11, 90),
+(32, 25, 49, 51, 1114),
+(33, 26, 49, 1, 233),
+(34, 26, 52, 1, 0),
+(35, 27, 52, 1, 111);
 
 -- --------------------------------------------------------
 
@@ -154,7 +178,8 @@ INSERT INTO `product` (`product_id`, `product_name`, `describe_product`, `quanti
 (33, 'yến 8', '', 1, 233, 'Copy of H 1  yến sào hồng sâm-01.png', '2024-12-18 01:02:44', 23, 15),
 (34, 'yến 9', '', 2, 233, 'Copy of KHÔNG-ĐƯỜNG-png-scaled-e1636422295115.png', '2024-12-18 01:02:54', 23, 15),
 (35, 'yến 10', '', 2, 321, 'Copy of H 1  hồng sâm đông trùng hạ thảo-01.png', '2024-12-18 01:03:12', 23, 15),
-(36, 'yến 11', '', 1, 233, 'Copy of Nuoc yen nhan sam 2.png', '2024-12-18 01:03:25', 23, 15);
+(36, 'yến 11', '', 1, 233, 'Copy of Nuoc yen nhan sam 2.png', '2024-12-18 01:03:25', 23, 15),
+(37, 'bb', 'dsadsa', 2, 234, 'fruit.jpg', '2025-01-02 01:51:28', 24, 15);
 
 -- --------------------------------------------------------
 
@@ -183,21 +208,16 @@ INSERT INTO `role` (`role_id`, `role_name`) VALUES
 
 CREATE TABLE `saleoff` (
   `saleoff_id` int(5) NOT NULL,
-  `discount_rate` int(5) DEFAULT NULL,
-  `point` int(11) DEFAULT NULL,
-  `discount` int(11) DEFAULT NULL
+  `sale_name` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `saleoff`
 --
 
-INSERT INTO `saleoff` (`saleoff_id`, `discount_rate`, `point`, `discount`) VALUES
-(15, 20, NULL, 0),
-(16, NULL, 100, 50000),
-(17, NULL, 200, 100000),
-(18, NULL, 1000, 1000000),
-(19, NULL, 2000, 2000000);
+INSERT INTO `saleoff` (`saleoff_id`, `sale_name`) VALUES
+(15, 20),
+(16, 0);
 
 -- --------------------------------------------------------
 
@@ -209,6 +229,14 @@ CREATE TABLE `slide` (
   `slide_id` int(11) NOT NULL,
   `slide_img` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `slide`
+--
+
+INSERT INTO `slide` (`slide_id`, `slide_img`) VALUES
+(4, '5_banner (1).jpg'),
+(5, '7_banner (2).jpg');
 
 -- --------------------------------------------------------
 
@@ -229,7 +257,8 @@ INSERT INTO `status` (`status_id`, `status_name`) VALUES
 (1, 'chuẩn bị hàng'),
 (2, 'đang vận chuyển'),
 (3, 'đang giao hàng'),
-(4, 'đã giao');
+(4, 'đã giao'),
+(5, 'đã hủy đơn');
 
 -- --------------------------------------------------------
 
@@ -248,7 +277,27 @@ CREATE TABLE `type` (
 --
 
 INSERT INTO `type` (`type_id`, `type_name`, `type_img`) VALUES
-(23, 'yến', 'Copy of H 1  hồng sâm đông trùng hạ thảo-01.png');
+(23, 'yến', 'Copy of H 1  hồng sâm đông trùng hạ thảo-01.png'),
+(24, 'rong nho', 'fruit.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `video`
+--
+
+CREATE TABLE `video` (
+  `video_id` int(11) NOT NULL,
+  `link` varchar(100) NOT NULL,
+  `note` varchar(200) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `video`
+--
+
+INSERT INTO `video` (`video_id`, `link`, `note`) VALUES
+(1, '2024-10-28 13-33-26.mkv', 'a');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -322,6 +371,12 @@ ALTER TABLE `type`
   ADD PRIMARY KEY (`type_id`);
 
 --
+-- Chỉ mục cho bảng `video`
+--
+ALTER TABLE `video`
+  ADD PRIMARY KEY (`video_id`);
+
+--
 -- AUTO_INCREMENT cho các bảng đã đổ
 --
 
@@ -329,31 +384,31 @@ ALTER TABLE `type`
 -- AUTO_INCREMENT cho bảng `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `customer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT cho bảng `note`
 --
 ALTER TABLE `note`
-  MODIFY `note_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `note_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT cho bảng `oder`
 --
 ALTER TABLE `oder`
-  MODIFY `oder_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `oder_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT cho bảng `oder_detail`
 --
 ALTER TABLE `oder_detail`
-  MODIFY `detail_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `detail_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT cho bảng `product`
 --
 ALTER TABLE `product`
-  MODIFY `product_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `product_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT cho bảng `role`
@@ -365,25 +420,31 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT cho bảng `saleoff`
 --
 ALTER TABLE `saleoff`
-  MODIFY `saleoff_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `saleoff_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT cho bảng `slide`
 --
 ALTER TABLE `slide`
-  MODIFY `slide_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `slide_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT cho bảng `status`
 --
 ALTER TABLE `status`
-  MODIFY `status_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `status_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT cho bảng `type`
 --
 ALTER TABLE `type`
-  MODIFY `type_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `type_id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT cho bảng `video`
+--
+ALTER TABLE `video`
+  MODIFY `video_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Các ràng buộc cho các bảng đã đổ

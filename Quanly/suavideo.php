@@ -3,44 +3,43 @@ include '../database/connect.php';
 include '../thanhgiaodien/header.php';
 
 if (isset($_GET['id'])) {
-    $note_id = $_GET['id'];
+    $video_id = $_GET['id'];
 
-    $stmt = $conn->prepare("SELECT * FROM note WHERE note_id = ?");
-    $stmt->bind_param("i", $note_id);
+    $stmt = $conn->prepare("SELECT * FROM video WHERE video_id = ?");
+    $stmt->bind_param("i", $video_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $note = $result->fetch_assoc();
+        $video = $result->fetch_assoc();
     } else {
-        echo "Tin tức không tồn tại.";
+        echo "Video không tồn tại.";
         exit();
     }
     $stmt->close();
 }
 
 if (isset($_POST['submit'])) {
-    $note_name = trim($_POST['note_name']);
-    $description = trim($_POST['description']);
-    $note_img = $_FILES['img']['name'];
-    $note_img_tmp = $_FILES['img']['tmp_name'];
-    if (!empty($note_img)) {
-        $upload_dir = '../anh/';
-        $upload_file = $upload_dir . basename($note_img);
-        move_uploaded_file($note_img_tmp, $upload_file);
+    $note = trim($_POST['note']);
+    $video_img = $_FILES['video_img']['name'];
+    $video_img_tmp = $_FILES['video_img']['tmp_name'];
+    if (!empty($video_img)) {
+        $upload_dir = '../videos/';
+        $upload_file = $upload_dir . basename($video_img);
+        move_uploaded_file($video_img_tmp, $upload_file);
     } else {
-        // Nếu không chọn ảnh mới, giữ nguyên ảnh cũ
-        $note_img = $note['note_img'];
+        // Nếu không chọn video mới, giữ nguyên video cũ
+        $video_img = $video['video_img'];
     }
 
-    $stmt = $conn->prepare("UPDATE note SET note_name = ?, description = ?, note_img = ? WHERE note_id = ?");
-    $stmt->bind_param("sssi", $note_name, $description, $note_img, $note_id);
+    $stmt = $conn->prepare("UPDATE video SET note = ?, video_img = ? WHERE video_id = ?");
+    $stmt->bind_param("ssi", $note, $video_img, $video_id);
 
     if ($stmt->execute()) {
-        header("Location: tintuc.php");
+        header("Location: video.php");
         exit();
     } else {
-        echo "Lỗi cập nhật sản phẩm: " . $stmt->error;
+        echo "Lỗi cập nhật video: " . $stmt->error;
     }
     $stmt->close();
 }
@@ -52,7 +51,7 @@ if (isset($_POST['submit'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sửa người dùng</title>
+    <title>Sửa video</title>
     <link rel="stylesheet" href="../path/to/your/css/bootstrap.min.css">
     <style>
         body {
@@ -124,24 +123,24 @@ if (isset($_POST['submit'])) {
 <body>
     <div class="container-fluid">
         <div class="card">
-            <div class="card-header">Sửa thông tin tin tức</div>
+            <div class="card-header">Sửa thông tin video</div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label class="form-label">Tiêu đề tin tức</label>
-                        <input type="text" name="note_name" value="<?= $note['note_name'] ?>" class="form-control" />
+                        <label class="form-label">Tiêu đề video</label>
+                        <input type="text" name="note" value="<?= $video['note'] ?>" class="form-control" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Địa chỉ</label>
-                        <input type="text" name="description" value="<?= $note['description'] ?>"
-                            class="form-control" />
+                        <label class="form-label">Video (giữ nguyên nếu không chọn mới)</label>
+                        <input type="file" name="video_img" class="form-control" accept="video/*" />
+                        <p>Video hiện tại:
+                            <video width="320" height="240" controls>
+                                <source src="../videos/<?= $video['video_img'] ?>" type="video/mp4">
+                                Trình duyệt của bạn không hỗ trợ video.
+                            </video>
+                        </p>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Ảnh sản phẩm (giữ nguyên nếu không chọn mới)</label>
-                        <input type="file" name="note_img" class="form-control" />
-                        <p>Ảnh hiện tại: <img src="../anh/<?= $note['note_img'] ?>" alt="" width="100"></p>
-                    </div>
-                    <button name="submit" type="submit" class="btn btn-success">Cập nhật tin tức</button>
+                    <button name="submit" type="submit" class="btn btn-success">Cập nhật video</button>
                 </form>
             </div>
         </div>

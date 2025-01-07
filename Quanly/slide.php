@@ -1,7 +1,7 @@
 <?php
+$title = "Quản lý slide";
 include '../Thanhgiaodien/header.php';
 include '../database/connect.php';
-
 // Fetch slide data
 $sql = "SELECT * FROM slide";
 $query = mysqli_query($conn, $sql);
@@ -50,15 +50,9 @@ if (!$query) {
         <div class="sidebar">
             <h2>Quản Lý</h2>
             <ul>
-                <li><a href="../Quanly/nguoidung.php">Quản lý người dùng</a></li>
-                <li><a href="../Quanly/nhanvien.php">Quản lý nhân viên</a></li>
-                <li><a href="../Quanly/sanpham.php">Quản lý sản phẩm</a></li>
-                <li><a href="../Quanly/donhang.php">Quản lý đơn hàng</a></li>
-                <li><a href="../Quanly/qlslsp.php">Quản lý sl trong đơn hàng</a></li>
-                <li><a href="../Quanly/loaisp.php">Quản lý loại sản phẩm</a></li>
-                <li><a href="../Quanly/giamgia.php">Quản lý giảm giá</a></li>
-                <li><a href="../Quanly/tintuc.php">Quản lý tin tức</a></li>
-                <li><a href="../Quanly/slide.php">Quản lý slide</a></li>
+                <?php
+                include 'sidebar.php';
+                ?>
             </ul>
         </div>
 
@@ -89,7 +83,6 @@ if (!$query) {
                                     <img src="../anh/<?= htmlspecialchars($row['slide_img']) ?>" alt="Slide Image">
                                 </td>
                                 <td>
-                                    <a class="btn" href="suaslide.php?id=<?= htmlspecialchars($row['slide_id']) ?>">Sửa</a>
                                     <a class="btn" onclick="return confirmDelete('<?= htmlspecialchars($row['slide_id']) ?>')"
                                         href="xoaslide.php?id=<?= htmlspecialchars($row['slide_id']) ?>">Xóa</a>
                                 </td>

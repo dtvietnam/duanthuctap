@@ -1,133 +1,120 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
+$title = "Chi tiết đơn hàng";
+include '../database/connect.php';
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-    .hd {
-        position: relative;
-        top: 120px;
+$oder_id = intval($_GET['id'] ?? 0);
+
+if ($oder_id === 0) {
+    echo "Mã đơn hàng không hợp lệ.";
+    exit;
+}
+
+// Kiểm tra trạng thái hiện tại
+$sql_check_order = "SELECT * FROM `oder` WHERE `oder_id` = $oder_id";
+$result_check_order = mysqli_query($conn, $sql_check_order);
+
+if (mysqli_num_rows($result_check_order) == 0) {
+    echo "Đơn hàng không tồn tại.";
+    exit;
+}
+
+if (isset($_POST['submit'])) {
+    // Lấy trạng thái hiện tại của đơn hàng
+    $sql_get_status = "SELECT status_id FROM `oder` WHERE `oder_id` = $oder_id";
+    $query_status = mysqli_query($conn, $sql_get_status);
+    if ($query_status && $row = mysqli_fetch_assoc($query_status)) {
+        $current_status = (int)$row['status_id'];
+
+        // Tăng trạng thái thêm 1
+        $new_status = $current_status + 1;
+
+        // Kiểm tra nếu trạng thái mới tồn tại trong bảng `status`
+        $sql_check_status = "SELECT COUNT(*) as count FROM `status` WHERE `status_id` = $new_status";
+        $query_check_status = mysqli_query($conn, $sql_check_status);
+        $status_exists = mysqli_fetch_assoc($query_check_status)['count'] ?? 0;
+
+        if ($status_exists > 0) {
+            // Cập nhật trạng thái đơn hàng
+            $update_sql = "UPDATE `oder` SET `status_id` = $new_status WHERE `oder_id` = $oder_id";
+            $update_query = mysqli_query($conn, $update_sql);
+
+            if ($update_query) {
+                echo "<script>alert('Trạng thái đơn hàng đã được cập nhật thành công!');</script>";
+                echo "<script>window.location.href = 'donhang.php';</script>";
+            } else {
+                echo "Có lỗi xảy ra khi cập nhật trạng thái: " . mysqli_error($conn);
+            }
+        } else {
+            echo "<script>alert('Không thể cập nhật trạng thái vì trạng thái mới không hợp lệ!');</script>";
+            echo "<script>window.location.href = 'donhang.php';</script>";
+        }
+    } else {
+        echo "Không thể lấy trạng thái hiện tại của đơn hàng: " . mysqli_error($conn);
     }
+}
+// Truy vấn thông tin chi tiết đơn hàng
+$sql = "SELECT 
+    o.oder_id,
+    o.oder_date,
+    o.address AS order_address,
+    o.total_price,
+    c.customer_name,
+    c.phone_number,
+    c.address AS customer_address,
+    st.status_name
+FROM 
+    `oder` o
+INNER JOIN 
+    `customer` c ON o.customer_id = c.customer_id
+INNER JOIN 
+    `status` st ON o.status_id = st.status_id
+WHERE 
+    o.oder_id = $oder_id";
 
-    .nd {
-        width: 80%;
-        margin: 30px auto;
-        padding: 20px;
-        max-width: 500px;
-        font-family: Arial, sans-serif;
-        color: #333;
-    }
+$query = mysqli_query($conn, $sql);
+$order_info = mysqli_fetch_assoc($query);
 
-    .nd h2 {
-        margin: 0 0 15px 0;
-        font-size: 30px;
-        color: #4CAF50;
-        font-weight: bold;
-        text-align: center;
-    }
+$sql_product = "SELECT 
+    p.product_name, 
+    od.quantity_oder, 
+    od.price_oder
+FROM 
+    oder_detail od
+INNER JOIN 
+    product p ON od.product_id = p.product_id
+WHERE 
+    od.oder_id = $oder_id";
 
-    .nd h3 {
-        margin: 10px 0;
-        font-size: 18px;
-        color: #555;
-        line-height: 1.5;
-    }
+$query1 = mysqli_query($conn, $sql_product);
+?>
 
-    .nd h3 span {
-        color: #000;
-        font-weight: bold;
-    }
-
-    .hoadon {
-        position: relative;
-        top: 20%;
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-    }
-
-    .colum {
-        width: 80%;
-        margin: 30px auto;
-        border: 1px solid #ddd;
-        background-color: white;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .row-header,
-    .row-item {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-        text-align: center;
-        border-bottom: 1px solid #ddd;
-    }
-
-    .row-header {
-        background-color: rgb(97, 227, 101);
-        color: white;
-        text-transform: uppercase;
-        font-weight: bold;
-    }
-
-    .row-header h4,
-    .row-item h5 {
-        margin: 5px 0;
-        padding: 10px;
-    }
-
-    .row-item:nth-child(odd) {
-        background-color: #f9f9f9;
-    }
-
-    a:hover {
-        color: white;
-        background-color: blue;
-    }
-    </style>
-
-
-</head>
-<?php include '../Thanhgiaodien/header.php' ?>
-
-<body>
-
-    <div class="hd">
-        <div class="nd">
-            <h2>Thông tin chi tiết</h2>
-            <h3>Mã Hóa Đơn: <?php echo "hd-001"; ?></h3>
-            <h3>Ngày đặt hàng<?php echo "27 tháng 4"; ?> </h3>
-        </div>
-
-
-        <div class="hoadon">
-            <div class="colum">
-                <div class="row-header">
-                    <h4>Tên sản phẩm</h4>
-                    <h4>Số lượng </h4>
-                    <h4>Loại sản phẩm</h4>
-                    <h4>Giá sản phẩm </h4>
-                    <h4>Trạng thái đơn hàng</h4>
-
-                </div>
-                <div class="row-item">
-                    <h5>kẹo</h5>
-                    <h5>4 </h5>
-                    <h5>loại</h5>
-                    <h5>200000</h5>
-                    <h5>Đã giao</h5>
-                </div>
-                <div class="row-item">
-                    <h5>kẹo</h5>
-                    <h5>4 </h5>
-                    <h5>loại</h5>
-                    <h5>200000</h5>
-                    <h5>chưa giao</h5>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-
-</html>
+<div>
+    <h2>Chi tiết đơn hàng</h2>
+    <p>Mã Hóa Đơn: <?= $order_info['oder_id'] ?></p>
+    <p>Tên người nhận: <?= $order_info['customer_name'] ?></p>
+    <p>Địa chỉ giao hàng: <?= $order_info['order_address'] ?></p>
+    <p>Trạng thái đơn hàng: <?= $order_info['status_name'] ?></p>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>Tên sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Giá</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        while ($row = mysqli_fetch_assoc($query1)) { ?>
+            <tr>
+                <td><?= $row['product_name'] ?></td>
+                <td><?= $row['quantity_oder'] ?></td>
+                <td><?= number_format($row['price_oder'], 0, ',', '.') ?> VND</td>
+            </tr>
+        <?php } ?>
+    </tbody>
+</table>
+<form method="POST" action="">
+    <input type="hidden" name="oder_id" value="<?= $oder_id ?>">
+    <button type="submit" name="submit">Xác nhận đơn hàng</button>
+</form>

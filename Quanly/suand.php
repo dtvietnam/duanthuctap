@@ -23,11 +23,11 @@ if (isset($_POST['submit'])) {
     $phone_number = trim($_POST['phone_number']);
     $customer_name = trim($_POST['customer_name']);
     $address = trim($_POST['address']);
-    $gmail = trim($_POST['gmail']);
+    $point = $_POST['point'];
 
     // Cập nhật sản phẩm vào CSDL
-    $stmt = $conn->prepare("UPDATE customer SET phone_number = ?, customer_name = ?, address = ?, gmail = ? WHERE customer_id = ?");
-    $stmt->bind_param("issss", $phone_number, $customer_name, $address, $gmail, $customer_id);
+    $stmt = $conn->prepare("UPDATE customer SET phone_number = ?, customer_name = ?, address = ?, point = ? WHERE customer_id = ?");
+    $stmt->bind_param("issis", $phone_number, $customer_name, $address, $point, $customer_id);
 
     if ($stmt->execute()) {
         header("Location: nguoidung.php");
@@ -48,69 +48,69 @@ if (isset($_POST['submit'])) {
     <title>Sửa người dùng</title>
     <link rel="stylesheet" href="../path/to/your/css/bootstrap.min.css">
     <style>
-    body {
-        position: relative;
-        top: 120px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 600px;
-        margin: 0;
-        background-color: #f8f9fa;
-        font-family: Arial, sans-serif;
-    }
+        body {
+            position: relative;
+            top: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 600px;
+            margin: 0;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
 
-    .card {
-        width: 100%;
-        background: #ffffff;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-    }
+        .card {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
 
-    .card-header {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
-        text-align: center;
-    }
+        .card-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-    .form-grid {
-        width: 600px;
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        gap: 15px 20px;
-        align-items: center;
-    }
+        .form-grid {
+            width: 600px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px 20px;
+            align-items: center;
+        }
 
-    .form-label {
-        font-weight: bold;
-        text-align: right;
-    }
+        .form-label {
+            font-weight: bold;
+            text-align: right;
+        }
 
-    .form-control {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-    }
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
 
-    .btn {
-        grid-column: 1 / -1;
-        padding: 10px;
-        font-size: 16px;
-        background: #28a745;
-        border: none;
-        color: white;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+        .btn {
+            grid-column: 1 / -1;
+            padding: 10px;
+            font-size: 16px;
+            background: #28a745;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    .btn:hover {
-        background: #218838;
-    }
+        .btn:hover {
+            background: #218838;
+        }
     </style>
 </head>
 
@@ -135,8 +135,8 @@ if (isset($_POST['submit'])) {
                         <input type="text" name="address" value="<?= $customer['address'] ?>" class="form-control" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="text" name="gmail" value="<?= $customer['gmail'] ?>" class="form-control" />
+                        <label class="form-label">Point</label>
+                        <input type="text" name="point" value="<?= $customer['point'] ?>" class="form-control" />
                     </div>
                     <button name="submit" type="submit" class="btn btn-success">Cập nhật thông tin người dùng</button>
                 </form>

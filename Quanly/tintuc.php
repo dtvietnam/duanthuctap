@@ -1,6 +1,8 @@
 <?php
+$title = "Tin tức";
 include '../Thanhgiaodien/header.php';
 include '../database/connect.php';
+
 ?>
 
 <?php
@@ -27,15 +29,9 @@ if (!$query) {
         <div class="sidebar">
             <h2>Quản Lý</h2>
             <ul>
-                <li><a href="../Quanly/nguoidung.php">Quản lý người dùng</a></li>
-                <li><a href="../Quanly/nhanvien.php">Quản lý nhân viên</a></li>
-                <li><a href="../Quanly/sanpham.php">Quản lý sản phẩm</a></li>
-                <li><a href="../Quanly/donhang.php">Quản lý đơn hàng</a></li>
-                <li><a href="../Quanly/qlslsp.php">Quản lý sl trong đơn hàng</a></li>
-                <li><a href="../Quanly/loaisp.php">Quản lý loại sản phẩm</a></li>
-                <li><a href="../Quanly/giamgia.php">Quản lý giảm giá</a></li>
-                <li><a href="../Quanly/tintuc.php">Quản lý tin tức</a></li>
-                <li><a href="../Quanly/slide.php">Quản lý slide</a></li>
+                <?php
+                include 'sidebar.php';
+                ?>
             </ul>
         </div>
 
@@ -56,9 +52,9 @@ if (!$query) {
                     <tr>
                         <th>STT</th>
                         <th>ID tin tức</th>
+                        <th>Tên bảng tin</th>
                         <th>nội dung tin</th>
                         <th>ảnh tin tức</th>
-                        <th>Tên bảng tin</th>
                         <th>Quản Lý</th>
                     </tr>
                 </thead>

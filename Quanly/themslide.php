@@ -9,8 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validate the uploaded file
     $allowed_types = ['image/jpeg', 'image/png', 'image/jpg'];
-    $max_file_size = 2 * 1024 * 1024; // 2MB
-
+    $max_file_size = 10 * 1024 * 1024;
     if (!in_array($_FILES['slide_img']['type'], $allowed_types)) {
         $error = "Chỉ cho phép các định dạng ảnh JPG, PNG.";
     } elseif ($_FILES['slide_img']['size'] > $max_file_size) {
